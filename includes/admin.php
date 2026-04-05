@@ -118,9 +118,11 @@ function sbo_get_field_schema(): array {
 		],
 		'Key Web Pages' => [
 			'one_page_about'         => [ 'label' => 'About',              'type' => 'page' ],
+			'one_page_blog'         => [ 'label' => 'Blog',              'type' => 'page' ],
 			'one_page_contact'         => [ 'label' => 'Contact',              'type' => 'page' ],
 			'one_page_sitemap'         => [ 'label' => 'Sitemap',              'type' => 'page' ],
-			
+			'one_page_privacy'         => [ 'label' => 'Privacy',              'type' => 'page' ],
+			'one_page_terms'           => [ 'label' => 'Terms',                'type' => 'page' ],
 		],
 		'Marketing' => [
 			'one_headline'         => [ 'label' => 'Headline',              'type' => 'text' ],
