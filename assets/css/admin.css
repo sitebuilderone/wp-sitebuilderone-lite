@@ -1,0 +1,107 @@
+/* WP SiteBuilderOne Lite — Admin Styles */
+
+.sbo-wrap h1 {
+	margin-bottom: 1em;
+}
+
+/* Section headings */
+.sbo-section-heading {
+	font-size: 2em;
+	font-weight: 600;
+	border-bottom: 1px solid #dcdcde;
+	padding-bottom: 0.4em;
+	margin-top: 2em;
+	margin-bottom: 0;
+}
+
+/* Field table */
+.sbo-fields-table th {
+	width: 220px;
+	font-weight: 500;
+}
+
+.sbo-fields-table td input.regular-text {
+	width: 100%;
+	max-width: 480px;
+}
+
+.sbo-fields-table td textarea.large-text {
+	width: 100%;
+	max-width: 600px;
+	font-size: 13px;
+}
+
+.sbo-fields-table td textarea.code {
+	font-family: Consolas, "Courier New", Courier, monospace;
+	font-size: 12px;
+	background: #f6f7f7;
+}
+
+.sbo-field-hint {
+	color: #646970;
+	font-style: italic;
+	margin-top: 4px !important;
+}
+
+/* Shortcode reference */
+.sbo-shortcode-ref {
+	margin-top: 8px !important;
+	padding: 8px 10px;
+	background: #f0f6fc;
+	border-left: 3px solid #0073aa;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+.sbo-shortcode-code {
+	background: #fff;
+	border: 1px solid #dcdcde;
+	padding: 4px 6px;
+	border-radius: 3px;
+	font-size: 11px;
+	word-break: break-all;
+	flex: 1;
+	min-width: 250px;
+}
+
+.sbo-copy-shortcode {
+	white-space: nowrap;
+	flex-shrink: 0;
+}
+
+.sbo-copy-shortcode:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
+/* CSV import/export box */
+.sbo-csv-box {
+	margin-top: 2.5em;
+	padding: 1.25em 1.5em;
+	background: #f6f7f7;
+	border: 1px solid #dcdcde;
+	border-radius: 3px;
+	max-width: 680px;
+}
+
+.sbo-csv-box h2 {
+	margin-top: 0;
+	font-size: 1.1em;
+}
+
+.sbo-csv-box h3 {
+	font-size: 0.95em;
+	margin-bottom: 0.3em;
+}
+
+.sbo-csv-box p {
+	margin-top: 0.2em;
+	color: #3c434a;
+}
+
+.sbo-csv-box input[type="file"] {
+	display: block;
+	margin-bottom: 0.75em;
+}

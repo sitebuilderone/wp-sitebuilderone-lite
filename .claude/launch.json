@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "WordPress Site (localdb.local)",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": ["-c", "while true; do sleep 10; done"],
+      "port": 10018
+    },
+    {
+      "name": "Theme CSS Watcher",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "watch"],
+      "port": 0
+    }
+  ]
+}
