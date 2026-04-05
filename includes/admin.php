@@ -2,6 +2,109 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 // ---------------------------------------------------------------------------
+// Add SiteBuilderOne link to the WP Admin top bar.
+// ---------------------------------------------------------------------------
+add_action( 'admin_bar_menu', function ( WP_Admin_Bar $bar ) {
+    if ( ! current_user_can( 'manage_options' ) ) return;
+
+    $bar->add_node( [
+        'id'    => 'sbo-settings',
+        'title' => 'SiteBuilderOne',
+        'href'  => admin_url( 'options-general.php?page=wp-sitebuilderone-lite' ),
+        'meta'  => [
+            'title' => 'SiteBuilderOne Settings',
+        ],
+    ] );
+}, 100 );
+
+// ---------------------------------------------------------------------------
+// Required plugins notice on the Plugins page.
+// ---------------------------------------------------------------------------
+add_action( 'admin_notices', function () {
+    $screen = get_current_screen();
+    if ( ! $screen || 'plugins' !== $screen->id ) return;
+    if ( ! current_user_can( 'manage_options' ) ) return;
+
+    $required = [
+        [
+            'name'   => 'WP Sitemap Page',
+            'slug'   => 'wp-sitemap-page',
+            'check'  => 'wp-sitemap-page/wp-sitemap-page.php', // folder/main-file.php
+			],
+
+		[
+    'name'  => 'RankMath SEO',
+    'slug'  => 'seo-by-rank-math',
+    'check' => 'seo-by-rank-math/rank-math.php',
+],
+[
+    'name'  => 'RankMath Instant Indexing',
+    'slug'  => 'fast-indexing-api',
+    'check' => 'fast-indexing-api/instant-indexing.php',
+],
+[
+    'name'  => 'SiteKit by Google',
+    'slug'  => 'google-site-kit',
+    'check' => 'google-site-kit/google-site-kit.php',
+],
+[
+    'name'  => 'Clarity',
+    'slug'  => 'microsoft-clarity',
+    'check' => 'microsoft-clarity/index.php',
+],
+[
+    'name'  => 'LiteSpeed Cache',
+    'slug'  => 'litespeed-cache',
+    'check' => 'litespeed-cache/litespeed-cache.php',
+],
+[
+    'name'  => 'Google Reviews by Trustindex',
+    'slug'  => 'wp-reviews-plugin-for-google',
+    'check' => 'wp-reviews-plugin-for-google/wp-reviews-plugin-for-google.php',
+],
+[
+    'name'  => 'Redirection',
+    'slug'  => 'redirection',
+    'check' => 'redirection/redirection.php',
+],
+[
+    'name'  => 'ReCaptcha',
+    'slug'  => 'advanced-google-recaptcha',
+    'check' => 'advanced-google-recaptcha/advanced-google-recaptcha.php',
+],
+
+
+    ];
+
+    $missing = [];
+    foreach ( $required as $plugin ) {
+        if ( ! is_plugin_active( $plugin['check'] ) ) {
+            $install_url = wp_nonce_url(
+                admin_url( 'update.php?action=install-plugin&plugin=' . $plugin['slug'] ),
+                'install-plugin_' . $plugin['slug']
+            );
+            $missing[] = sprintf(
+                '<strong>%s</strong> — <a href="%s">Install now</a>',
+                esc_html( $plugin['name'] ),
+                esc_url( $install_url )
+            );
+        }
+    }
+
+    if ( empty( $missing ) ) return;
+    ?>
+    <div class="notice notice-warning">
+        <p><strong>SiteBuilderOne</strong> recommends the following plugin(s):</p>
+        <ul style="list-style:disc;margin-left:1.5em;">
+            <?php foreach ( $missing as $item ) : ?>
+                <li><?php echo $item; ?></li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
+    <?php
+} );
+
+// ---------------------------------------------------------------------------
 // Field schema — single source of truth used by admin, shortcodes, and CSV.
 // ---------------------------------------------------------------------------
 function sbo_get_field_schema(): array {
@@ -13,10 +116,17 @@ function sbo_get_field_schema(): array {
 			'one_business_keywords'    => [ 'label' => 'Business Keywords',         'type' => 'text' ],
 			'one_banner_image'         => [ 'label' => 'Banner Image URL',          'type' => 'url' ],
 		],
+		'Key Web Pages' => [
+			'one_page_about'         => [ 'label' => 'About',              'type' => 'page' ],
+			'one_page_contact'         => [ 'label' => 'Contact',              'type' => 'page' ],
+			'one_page_sitemap'         => [ 'label' => 'Sitemap',              'type' => 'page' ],
+			
+		],
 		'Marketing' => [
 			'one_headline'         => [ 'label' => 'Headline',              'type' => 'text' ],
 			'one_headline_support' => [ 'label' => 'Headline Support Copy', 'type' => 'textarea' ],
 			'one_marketing_image'  => [ 'label' => 'Marketing Image URL',   'type' => 'url' ],
+			'one_cta_text'         => [ 'label' => 'CTA text',              'type' => 'text' ],
 		],
 		'Business Information' => [
 			'one_business_name'  => [ 'label' => 'Business Name',      'type' => 'text' ],
@@ -69,6 +179,7 @@ function sbo_sanitize_field( string $value, string $type, bool $raw ): string {
 	return match ( $type ) {
 		'url'      => esc_url_raw( $value ),
 		'email'    => sanitize_email( $value ),
+		'page'     => esc_url_raw( $value ),
 		'textarea' => sanitize_textarea_field( $value ),
 		default    => sanitize_text_field( $value ),
 	};
@@ -193,15 +304,37 @@ function sbo_render_admin_page(): void {
 									<?php if ( $is_raw ) : ?>
 										<p class="description sbo-field-hint">HTML accepted (iframe, meta tags). Scripts are stripped.</p>
 									<?php endif; ?>
-								<?php else : ?>
-									<input
-										type="<?php echo esc_attr( $type ); ?>"
-										id="<?php echo esc_attr( $html_id ); ?>"
-										name="sbo_fields[<?php echo esc_attr( $key ); ?>]"
-										value="<?php echo esc_attr( $val ); ?>"
-										class="regular-text"
-									>
-								<?php endif; ?>
+								<?php elseif ( 'page' === $type ) :
+    $pages = get_pages( [ 'sort_column' => 'menu_order', 'sort_order' => 'asc' ] );
+?>
+    <select
+        id="<?php echo esc_attr( $html_id ); ?>"
+        name="sbo_fields[<?php echo esc_attr( $key ); ?>]"
+        class="regular-text"
+    >
+        <option value="">— Select a page —</option>
+        <?php foreach ( $pages as $page ) :
+            $page_url = get_permalink( $page->ID );
+        ?>
+            <option value="<?php echo esc_attr( $page_url ); ?>"
+                <?php selected( $val, $page_url ); ?>>
+                <?php echo esc_html( $page->post_title ); ?>
+            </option>
+        <?php endforeach; ?>
+    </select>
+    <?php if ( $val ) : ?>
+        <a href="<?php echo esc_url( $val ); ?>" target="_blank" class="button button-small" style="margin-left:6px;">Visit ↗</a>
+    <?php endif; ?>
+
+<?php else : ?>
+    <input
+        type="<?php echo esc_attr( $type ); ?>"
+        id="<?php echo esc_attr( $html_id ); ?>"
+        name="sbo_fields[<?php echo esc_attr( $key ); ?>]"
+        value="<?php echo esc_attr( $val ); ?>"
+        class="regular-text"
+    >
+<?php endif; ?>
 
 								<?php if ( '' !== $val ) : ?>
 									<p class="description sbo-shortcode-ref">
