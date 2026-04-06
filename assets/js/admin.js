@@ -33,3 +33,31 @@ document.addEventListener( 'DOMContentLoaded', function() {
 		} );
 	} );
 } );
+
+
+// Media library picker
+document.querySelectorAll( '.sbo-media-picker' ).forEach( button => {
+    button.addEventListener( 'click', function () {
+        const targetId = this.getAttribute( 'data-target' );
+        const input    = document.getElementById( targetId );
+
+        const frame = wp.media( {
+            title:    'Select or Upload Image',
+            button:   { text: 'Use this image' },
+            multiple: false,
+            library:  { type: 'image' },
+        } );
+
+        frame.on( 'select', function () {
+            const attachment = frame.state().get( 'selection' ).first().toJSON();
+            input.value = attachment.url;
+            // Refresh the preview without a full page reload
+            let preview = input.closest( 'div' ).nextElementSibling;
+            if ( preview && preview.tagName === 'P' ) {
+                preview.querySelector( 'img' ).src = attachment.url;
+            }
+        } );
+
+        frame.open();
+    } );
+} );

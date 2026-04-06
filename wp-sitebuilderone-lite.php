@@ -27,3 +27,19 @@ add_action( 'plugins_loaded', function () {
 // Disable Gutenberg globally — force Classic Editor for all post types.
 add_filter( 'use_block_editor_for_post', '__return_false', 10 );
 add_filter( 'use_block_editor_for_post_type', '__return_false', 10 );
+
+function move_admin_bar_to_bottom() {
+    echo '
+    <style type="text/css">
+        html { margin-top: 0 !important; margin-bottom: 32px !important; }
+        #wpadminbar { top: auto !important; bottom: 0; position: fixed; }
+        #wpadminbar .menupop .ab-sub-wrapper { bottom: 32px; }
+        @media screen and (max-width: 782px) {
+            html { margin-bottom: 46px !important; }
+            #wpadminbar .menupop .ab-sub-wrapper { bottom: 46px; }
+        }
+    </style>';
+}
+add_action('wp_head', 'move_admin_bar_to_bottom');
+add_action('admin_head', 'move_admin_bar_to_bottom');
+

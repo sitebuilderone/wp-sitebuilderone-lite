@@ -17,6 +17,13 @@ add_action( 'admin_bar_menu', function ( WP_Admin_Bar $bar ) {
     ] );
 }, 100 );
 
+add_action( 'admin_enqueue_scripts', function ( string $hook ) {
+    if ( 'settings_page_wp-sitebuilderone-lite' !== $hook ) return;
+    wp_enqueue_style( 'sbo-admin', SBO_URL . 'assets/css/admin.css', [], SBO_VERSION );
+    wp_enqueue_script( 'sbo-admin', SBO_URL . 'assets/js/admin.js', [], SBO_VERSION, true );
+    wp_enqueue_media(); // ← add this
+} );
+
 // ---------------------------------------------------------------------------
 // Required plugins notice on the Plugins page.
 // ---------------------------------------------------------------------------
@@ -127,7 +134,7 @@ function sbo_get_field_schema(): array {
 		'Marketing' => [
 			'one_headline'         => [ 'label' => 'Headline',              'type' => 'text' ],
 			'one_headline_support' => [ 'label' => 'Headline Support Copy', 'type' => 'textarea' ],
-			'one_marketing_image'  => [ 'label' => 'Marketing Image URL',   'type' => 'url' ],
+			'one_marketing_image'  => [ 'label' => 'Marketing Image URL',   'type' => 'media' ],
 			'one_cta_text'         => [ 'label' => 'CTA text',              'type' => 'text' ],
 		],
 		'Business Information' => [
@@ -249,6 +256,13 @@ function sbo_render_admin_page(): void {
 		add_query_arg( 'action', 'sbo_export_csv', admin_url( 'admin-post.php' ) ),
 		'sbo_export_csv'
 	);
+
+
+
+
+
+
+	
 	?>
 	<div class="wrap sbo-wrap">
 		<h1>SiteBuilderOne Settings</h1>
@@ -327,6 +341,28 @@ function sbo_render_admin_page(): void {
     <?php if ( $val ) : ?>
         <a href="<?php echo esc_url( $val ); ?>" target="_blank" class="button button-small" style="margin-left:6px;">Visit ↗</a>
     <?php endif; ?>
+
+
+	<?php elseif ( 'media' === $type ) : ?>
+    <div style="display:flex;align-items:center;gap:8px;">
+        <input
+            type="text"
+            id="<?php echo esc_attr( $html_id ); ?>"
+            name="sbo_fields[<?php echo esc_attr( $key ); ?>]"
+            value="<?php echo esc_attr( $val ); ?>"
+            class="regular-text sbo-media-url"
+        >
+        <button type="button"
+            class="button sbo-media-picker"
+            data-target="<?php echo esc_attr( $html_id ); ?>">
+            Choose Image
+        </button>
+    </div>
+    <?php if ( $val ) : ?>
+        <p><img src="<?php echo esc_url( $val ); ?>"
+            style="max-width:200px;max-height:80px;margin-top:6px;border:1px solid #dcdcde;border-radius:3px;"></p>
+    <?php endif; ?>
+
 
 <?php else : ?>
     <input

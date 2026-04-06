@@ -55,4 +55,41 @@ add_action( 'init', function () {
 
 		return esc_html( $value );
 	} );
+
+	add_shortcode( 'sbo_url', function( $atts ) {
+    $atts = shortcode_atts( [ 'name' => '' ], $atts, 'sbo_url' );
+    if ( '' === $atts['name'] ) return '';
+    return esc_url( sbo_get( $atts['name'] ) );
 } );
+
+
+} );
+
+
+
+
+add_action( 'init', function() {
+    if ( function_exists( 'tangible_template' ) ) {
+        tangible_template()->set_variable( 
+            'sbo_marketing_image', 
+            esc_url( sbo_get( 'one_marketing_image' ) ) 
+        );
+    }
+});
+
+
+add_action( 'plugins_loaded', function() {
+    add_filter( 'tangible_template_variable', function( $value, $name ) {
+        // Allow any sbo_ field to be accessed as {sbo_one_marketing_image} etc.
+        if ( str_starts_with( $name, 'sbo_' ) ) {
+            $field = substr( $name, 4 ); // strip "sbo_" prefix
+            return esc_url( sbo_get( $field ) );
+        }
+        return $value;
+    }, 10, 2 );
+} );
+
+
+
+
+
