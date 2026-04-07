@@ -15,6 +15,27 @@ add_action( 'admin_bar_menu', function ( WP_Admin_Bar $bar ) {
             'title' => 'SiteBuilderOne Settings',
         ],
     ] );
+
+	$bar->add_node( [
+        'id'     => 'sbo-edit-header',
+        'parent' => 'sbo-settings',
+        'title'  => 'Edit Header',
+        'href'   => home_url( '/?lc_partial=header&lc_action_launch_editing=1&from_url=%2Fwp-admin%2Fadmin.php%3Fpage%3Dlivecanvas' ),
+        'meta'   => [
+            'title' => 'Edit Header in LiveCanvas',
+        ],
+    ] );
+
+    $bar->add_node( [
+        'id'     => 'sbo-edit-footer',
+        'parent' => 'sbo-settings',
+        'title'  => 'Edit Footer',
+        'href'   => home_url( '/?lc_partial=footer&lc_action_launch_editing=1&from_url=%2Fwp-admin%2Fadmin.php%3Fpage%3Dlivecanvas' ),
+        'meta'   => [
+            'title' => 'Edit Footer in LiveCanvas',
+        ],
+    ] );
+
 }, 100 );
 
 add_action( 'admin_enqueue_scripts', function ( string $hook ) {
@@ -118,6 +139,7 @@ function sbo_get_field_schema(): array {
 	return [
 		'Branding' => [
 			'website_name'             => [ 'label' => 'Website Name',              'type' => 'text' ],
+			'one_home_url'       => [ 'label' => 'Home URL',          'type' => 'url' ],
 			'one_business_logo'        => [ 'label' => 'Business Logo URL',         'type' => 'url' ],
 			'one_business_description' => [ 'label' => 'Business Description',      'type' => 'textarea' ],
 			'one_business_keywords'    => [ 'label' => 'Business Keywords',         'type' => 'text' ],
@@ -155,13 +177,16 @@ function sbo_get_field_schema(): array {
 			'one_google_map_embed' => [ 'label' => 'Google Map Embed Code', 'type' => 'textarea', 'raw' => true ],
 		],
 		'Social Media' => [
-			'social-facebook'  => [ 'label' => 'Facebook',              'type' => 'url' ],
-			'social-linkedin'  => [ 'label' => 'LinkedIn',              'type' => 'url' ],
-			'social-youtube'   => [ 'label' => 'YouTube',               'type' => 'url' ],
-			'social-twitter-x' => [ 'label' => 'Twitter / X',           'type' => 'url' ],
-			'social-wordpress' => [ 'label' => 'WordPress.org Profile', 'type' => 'url' ],
-			'social-yelp'      => [ 'label' => 'Yelp',                  'type' => 'url' ],
-			'social-github'    => [ 'label' => 'GitHub',                'type' => 'url' ],
+			'social-facebook'        => [ 'label' => 'Facebook',              'type' => 'url' ],
+			'social-instagram'       => [ 'label' => 'Instagram',             'type' => 'url' ],
+			'social-linkedin'        => [ 'label' => 'LinkedIn',              'type' => 'url' ],
+			'social-youtube'         => [ 'label' => 'YouTube',               'type' => 'url' ],
+			'social-twitter-x'       => [ 'label' => 'Twitter / X',           'type' => 'url' ],
+			'social-google-business' => [ 'label' => 'Google Business',       'type' => 'url' ],
+			'social-wordpress'       => [ 'label' => 'WordPress.org Profile', 'type' => 'url' ],
+			'social-yelp'            => [ 'label' => 'Yelp',                  'type' => 'url' ],
+			'social-tripadvisor'     => [ 'label' => 'TripAdvisor',           'type' => 'url' ],
+			'social-github'          => [ 'label' => 'GitHub',                'type' => 'url' ],
 		],
 		'Business Schema Details' => [
 			'one_price_range'   => [ 'label' => 'Price Range',    'type' => 'text' ],

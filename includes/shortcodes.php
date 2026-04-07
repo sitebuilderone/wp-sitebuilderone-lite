@@ -92,4 +92,40 @@ add_action( 'plugins_loaded', function() {
 
 
 
+// In includes/shortcodes.php
+add_shortcode( 'sbo_link', function( $atts, $content ) {
+    $atts = shortcode_atts( ['name' => '', 'default' => '#'], $atts, 'sbo_link' );
+    $url  = sbo_get( $atts['name'], $atts['default'] );
+    return '<a href="' . esc_url( $url ) . '">' . esc_html( $content ) . '</a>';
+}, 10, 2 );
+
+/**
+ * [sbo_custom_logo] shortcode.
+ * Returns just the URL to the Customizer logo image.
+ *
+ * Attributes:
+ *   size — image size (default: 'full')
+ *
+ * Examples:
+ *   [sbo_custom_logo]
+ *   [sbo_custom_logo size="medium"]
+ */
+add_shortcode( 'sbo_custom_logo', function ( $atts ) {
+    $atts = shortcode_atts(
+        [ 'size' => 'full' ],
+        $atts,
+        'sbo_custom_logo'
+    );
+
+    $logo_id = get_theme_mod( 'custom_logo' );
+    if ( ! $logo_id ) return '';
+
+    $url = wp_get_attachment_image_url( $logo_id, $atts['size'] );
+    if ( ! $url ) return '';
+
+    // Strip the scheme + host so LiveCanvas doesn't double-prefix it.
+    $parsed = wp_parse_url( $url );
+    return $parsed['path'] ?? $url;
+} );
+
 

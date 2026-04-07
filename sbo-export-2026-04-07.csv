@@ -1,0 +1,48 @@
+﻿Section,Field,Value
+Branding,website_name,"SiteBuilderOne Lite"
+Branding,one_home_url,http://www.google.com
+Branding,one_business_logo,
+Branding,one_business_description,"Local business websites with WordPress and LiveCanvas"
+Branding,one_business_keywords,"wordpress, local business"
+Branding,one_banner_image,
+"Key Web Pages",one_page_about,http://localhost:10028/about/
+"Key Web Pages",one_page_blog,http://localhost:10028/blog/
+"Key Web Pages",one_page_contact,http://localhost:10028/contact/
+"Key Web Pages",one_page_sitemap,http://localhost:10028/sitemap/
+"Key Web Pages",one_page_privacy,http://localhost:10028/privacy-policy/
+"Key Web Pages",one_page_terms,
+Marketing,one_headline,"We build websites and more"
+Marketing,one_headline_support,"Stop wasting time and get a website up and running"
+Marketing,one_marketing_image,http://localhost:10028/wp-content/uploads/2026/04/chicago.jpg
+Marketing,one_cta_text,"Get more info"
+"Business Information",one_business_name,SiteBuilderOne
+"Business Information",one_business_phone,"778 830-0169"
+"Business Information",one_phone_web_ready,7788300169
+"Business Information",one_business_email,sitebuilderone@gmail.com
+"Physical Address",one_street_address,"34909 Old Yale Road"
+"Physical Address",one_city,Abbotsford
+"Physical Address",one_state,BC
+"Physical Address",one_postal_code,"V3G 2E7"
+"Physical Address",one_country,CA
+"Physical Address",one_latitude,
+"Physical Address",one_longitude,
+"Physical Address",one_google_map_url,https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d5223.931133442213!2d-122.68177520843001!3d49.10629459753853!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x5485cfd814ff2509%3A0xdc8d9a398f4bfc3f!2sGordon's%20VW!5e0!3m2!1sen!2sca!4v1775489449575!5m2!1sen!2sca
+"Physical Address",one_google_map_embed,https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d5223.931133442213!2d-122.68177520843001!3d49.10629459753853!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x5485cfd814ff2509%3A0xdc8d9a398f4bfc3f!2sGordon&#039;s%20VW!5e0!3m2!1sen!2sca!4v1775489449575!5m2!1sen!2sca
+"Social Media",social-facebook,https://www.facebook.com/people/Gordons-VW/100047184204351/
+"Social Media",social-instagram,
+"Social Media",social-linkedin,
+"Social Media",social-youtube,
+"Social Media",social-twitter-x,
+"Social Media",social-google-business,
+"Social Media",social-wordpress,
+"Social Media",social-yelp,
+"Social Media",social-tripadvisor,
+"Social Media",social-github,
+"Business Schema Details",one_price_range,
+"Business Schema Details",one_opening_hours,
+Integrations,one_header_code,
+Integrations,one_g-google_analytics,
+Integrations,one_g-google_search_console,
+Integrations,one_google_search_console_insights,
+Integrations,one_looker_studio,
+Integrations,one_bing_webmaster,

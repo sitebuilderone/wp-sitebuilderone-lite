@@ -22,7 +22,9 @@ add_action( 'plugins_loaded', function () {
 	require_once SBO_DIR . 'includes/admin.php';
 	require_once SBO_DIR . 'includes/shortcodes.php';
 	require_once SBO_DIR . 'includes/csv.php';
-} );
+    require_once SBO_DIR . 'includes/social-shortcodes.php';
+} 
+);
 
 // Disable Gutenberg globally — force Classic Editor for all post types.
 add_filter( 'use_block_editor_for_post', '__return_false', 10 );
