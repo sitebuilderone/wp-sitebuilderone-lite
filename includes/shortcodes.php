@@ -11,13 +11,6 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * @param string $default Fallback value when the field is empty or not set.
  * @return string Raw stored value (unsanitized — caller decides escaping context).
  */
-function sbo_get( string $field, string $default = '' ): string {
-	static $opts = null;
-	if ( null === $opts ) {
-		$opts = get_option( SBO_OPTION_KEY, [] );
-	}
-	return isset( $opts[ $field ] ) && '' !== $opts[ $field ] ? (string) $opts[ $field ] : $default;
-}
 
 /**
  * [sbo_field] shortcode.
@@ -129,3 +122,19 @@ add_shortcode( 'sbo_custom_logo', function ( $atts ) {
 } );
 
 
+/**
+ * [sbo_url name="field_key"] 
+ * Returns only the absolute URL of an image field.
+ */
+add_shortcode( 'sbo_url', function ( $atts ) {
+    $a = shortcode_atts( [
+        'name' => '',
+    ], $atts );
+
+    if ( empty( $a['name'] ) ) return '';
+
+    $url = sbo_get( $a['name'] );
+
+    // Ensure we return a valid absolute URL
+    return esc_url_raw( $url );
+} );

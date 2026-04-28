@@ -1,518 +1,375 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) exit;
-
+/**
+ * Plugin Name: SiteBuilderOne Lite
+ * Description: Lightweight WordPress plugin for local business websites. Powered by LiveCanvas.
+ * Version: 1.0.0
+ * Author: SiteBuilderOne
+ */
+if (! defined('ABSPATH')) exit;
 // ---------------------------------------------------------------------------
-// Add SiteBuilderOne link to the WP Admin top bar.
+// 2. Field Schema (Normalized with Descriptions)
 // ---------------------------------------------------------------------------
-add_action( 'admin_bar_menu', function ( WP_Admin_Bar $bar ) {
-    if ( ! current_user_can( 'manage_options' ) ) return;
-
-    $bar->add_node( [
-        'id'    => 'sbo-settings',
-        'title' => 'SiteBuilderOne',
-        'href'  => admin_url( 'options-general.php?page=wp-sitebuilderone-lite' ),
-        'meta'  => [
-            'title' => 'SiteBuilderOne Settings',
-        ],
-    ] );
-
-	$bar->add_node( [
-        'id'     => 'sbo-edit-header',
-        'parent' => 'sbo-settings',
-        'title'  => 'Edit Header',
-        'href'   => home_url( '/?lc_partial=header&lc_action_launch_editing=1&from_url=%2Fwp-admin%2Fadmin.php%3Fpage%3Dlivecanvas' ),
-        'meta'   => [
-            'title' => 'Edit Header in LiveCanvas',
-        ],
-    ] );
-
-    $bar->add_node( [
-        'id'     => 'sbo-edit-footer',
-        'parent' => 'sbo-settings',
-        'title'  => 'Edit Footer',
-        'href'   => home_url( '/?lc_partial=footer&lc_action_launch_editing=1&from_url=%2Fwp-admin%2Fadmin.php%3Fpage%3Dlivecanvas' ),
-        'meta'   => [
-            'title' => 'Edit Footer in LiveCanvas',
-        ],
-    ] );
-
-}, 100 );
-
-add_action( 'admin_enqueue_scripts', function ( string $hook ) {
-    if ( 'settings_page_wp-sitebuilderone-lite' !== $hook ) return;
-    wp_enqueue_style( 'sbo-admin', SBO_URL . 'assets/css/admin.css', [], SBO_VERSION );
-    wp_enqueue_script( 'sbo-admin', SBO_URL . 'assets/js/admin.js', [], SBO_VERSION, true );
-    wp_enqueue_media(); // ← add this
-} );
-
-// ---------------------------------------------------------------------------
-// Required plugins notice on the Plugins page.
-// ---------------------------------------------------------------------------
-add_action( 'admin_notices', function () {
-    $screen = get_current_screen();
-    if ( ! $screen || 'plugins' !== $screen->id ) return;
-    if ( ! current_user_can( 'manage_options' ) ) return;
-
-    $required = [
-        [
-            'name'   => 'WP Sitemap Page',
-            'slug'   => 'wp-sitemap-page',
-            'check'  => 'wp-sitemap-page/wp-sitemap-page.php', // folder/main-file.php
-			],
-
-		[
-    'name'  => 'RankMath SEO',
-    'slug'  => 'seo-by-rank-math',
-    'check' => 'seo-by-rank-math/rank-math.php',
-],
-[
-    'name'  => 'RankMath Instant Indexing',
-    'slug'  => 'fast-indexing-api',
-    'check' => 'fast-indexing-api/instant-indexing.php',
-],
-[
-    'name'  => 'SiteKit by Google',
-    'slug'  => 'google-site-kit',
-    'check' => 'google-site-kit/google-site-kit.php',
-],
-[
-    'name'  => 'Clarity',
-    'slug'  => 'microsoft-clarity',
-    'check' => 'microsoft-clarity/index.php',
-],
-[
-    'name'  => 'LiteSpeed Cache',
-    'slug'  => 'litespeed-cache',
-    'check' => 'litespeed-cache/litespeed-cache.php',
-],
-[
-    'name'  => 'Google Reviews by Trustindex',
-    'slug'  => 'wp-reviews-plugin-for-google',
-    'check' => 'wp-reviews-plugin-for-google/wp-reviews-plugin-for-google.php',
-],
-[
-    'name'  => 'Redirection',
-    'slug'  => 'redirection',
-    'check' => 'redirection/redirection.php',
-],
-[
-    'name'  => 'ReCaptcha',
-    'slug'  => 'advanced-google-recaptcha',
-    'check' => 'advanced-google-recaptcha/advanced-google-recaptcha.php',
-],
-
-
-    ];
-
-    $missing = [];
-    foreach ( $required as $plugin ) {
-        if ( ! is_plugin_active( $plugin['check'] ) ) {
-            $install_url = wp_nonce_url(
-                admin_url( 'update.php?action=install-plugin&plugin=' . $plugin['slug'] ),
-                'install-plugin_' . $plugin['slug']
-            );
-            $missing[] = sprintf(
-                '<strong>%s</strong> — <a href="%s">Install now</a>',
-                esc_html( $plugin['name'] ),
-                esc_url( $install_url )
-            );
-        }
-    }
-
-    if ( empty( $missing ) ) return;
-    ?>
-    <div class="notice notice-warning">
-        <p><strong>SiteBuilderOne</strong> recommends the following plugin(s):</p>
-        <ul style="list-style:disc;margin-left:1.5em;">
-            <?php foreach ( $missing as $item ) : ?>
-                <li><?php echo $item; ?></li>
-            <?php endforeach; ?>
-        </ul>
-    </div>
-    <?php
-} );
-
-// ---------------------------------------------------------------------------
-// Required pages notice on the Pages screen.
-// ---------------------------------------------------------------------------
-add_action( 'admin_notices', function () {
-    $screen = get_current_screen();
-    if ( ! $screen || 'edit-page' !== $screen->id ) return;
-    if ( ! current_user_can( 'manage_options' ) ) return;
-
-    if ( isset( $_GET['sbo_created'] ) ) {
-        echo '<div class="notice notice-success is-dismissible"><p>Page created successfully.</p></div>';
-    }
-
-    $required_pages = [
-        [ 'title' => 'Home',         'slug' => 'home' ],
-        [ 'title' => 'About',        'slug' => 'about' ],
-        [ 'title' => 'Contact',      'slug' => 'contact' ],
-        [ 'title' => 'Blog',         'slug' => 'blog' ],
-        [ 'title' => 'Sitemap',      'slug' => 'sitemap' ],
-		[ 'title' => 'Services',      'slug' => 'services' ],
-		[ 'title' => 'Brand Style Guide',      'slug' => 'style-guide' ],
-        [ 'title' => 'Privacy Policy', 'slug' => 'privacy-policy' ],
-        [ 'title' => 'Terms of Service', 'slug' => 'terms-of-service' ],
-    ];
-
-    $missing = [];
-    foreach ( $required_pages as $page ) {
-        $existing = get_page_by_path( $page['slug'] );
-        if ( ! $existing ) {
-            $create_url = wp_nonce_url(
-                add_query_arg(
-                    [ 'action' => 'sbo_create_page', 'sbo_page_title' => urlencode( $page['title'] ), 'sbo_page_slug' => $page['slug'] ],
-                    admin_url( 'admin-post.php' )
-                ),
-                'sbo_create_page_' . $page['slug']
-            );
-            $missing[] = sprintf(
-                '<strong>%s</strong> — <a href="%s">Create now</a>',
-                esc_html( $page['title'] ),
-                esc_url( $create_url )
-            );
-        }
-    }
-
-    if ( empty( $missing ) ) return;
-    ?>
-    <div class="notice notice-warning">
-        <p><strong>SiteBuilderOne</strong> recommends creating the following page(s):</p>
-        <ul style="list-style:disc;margin-left:1.5em;">
-            <?php foreach ( $missing as $item ) : ?>
-                <li><?php echo $item; ?></li>
-            <?php endforeach; ?>
-        </ul>
-    </div>
-    <?php
-} );
-
-// ---------------------------------------------------------------------------
-// Handler — create a single required page.
-// ---------------------------------------------------------------------------
-add_action( 'admin_post_sbo_create_page', function () {
-    if ( ! current_user_can( 'manage_options' ) ) wp_die( 'Unauthorized' );
-
-    $slug = isset( $_GET['sbo_page_slug'] ) ? sanitize_title( wp_unslash( $_GET['sbo_page_slug'] ) ) : '';
-    check_admin_referer( 'sbo_create_page_' . $slug );
-
-    $title = isset( $_GET['sbo_page_title'] ) ? sanitize_text_field( urldecode( wp_unslash( $_GET['sbo_page_title'] ) ) ) : $slug;
-
-    if ( $slug && ! get_page_by_path( $slug ) ) {
-        wp_insert_post( [
-            'post_title'  => $title,
-            'post_name'   => $slug,
-            'post_status' => 'publish',
-            'post_type'   => 'page',
-        ] );
-    }
-
-    wp_safe_redirect( admin_url( 'edit.php?post_type=page&sbo_created=1' ) );
-    exit;
-} );
-
-// ---------------------------------------------------------------------------
-// Field schema — single source of truth used by admin, shortcodes, and CSV.
-// ---------------------------------------------------------------------------
-function sbo_get_field_schema(): array {
+function sbo_get_field_schema(): array
+{
 	return [
 		'Branding' => [
-			'website_name'             => [ 'label' => 'Website Name',              'type' => 'text' ],
-			'one_home_url'       => [ 'label' => 'Home URL',          'type' => 'url' ],
-			'one_business_logo'        => [ 'label' => 'Business Logo URL',         'type' => 'url' ],
-			'one_business_description' => [ 'label' => 'Business Description',      'type' => 'textarea' ],
-			'one_business_keywords'    => [ 'label' => 'Business Keywords',         'type' => 'text' ],
-			'one_banner_image'         => [ 'label' => 'Banner Image URL',          'type' => 'url' ],
+			'id' => 'branding',
+			'description' => 'Core identity elements like logos and SEO keywords used across the site header and metadata[cite: 23].',
+			'fields' => [
+				'website_name'             => ['label' => 'Website Name',              'type' => 'text'],
+				'one_home_url'             => ['label' => 'Home URL',                  'type' => 'page'],
+				'one_business_logo'        => ['label' => 'Business Logo URL',         'type' => 'media'],
+				'one_business_description' => ['label' => 'Business Description',      'type' => 'textarea'],
+				'one_business_keywords'    => ['label' => 'Business Keywords',         'type' => 'text'],
+				'one_banner_image'         => ['label' => 'Banner Image URL',          'type' => 'url'],
+			]
+		],
+		'Global Footer' => [
+			'id' => 'footer',
+			'description' => 'Global footer information',
+			'fields' => [
+				'one_footer_desc'          => ['label' => 'Footer business description', 'type' => 'textarea', 'raw' => true],
+				'one_footer_01_title'      => ['label' => 'Footer header 01 title',      'type' => 'text'],
+				'one_footer_02_title'      => ['label' => 'Footer header 02 title',      'type' => 'text'],
+				'one_footer_sticky_enable' => ['label' => 'Enable Sticky Mobile Footer', 'type' => 'checkbox'],
+				'one_footer_sticky_text'   => ['label' => 'Button text', 'type' => 'text'],
+				'one_footer_sticky_url'   => ['label' => 'Button URL', 'type' => 'text'],
+				'one_footer_sticky_text_2'   => ['label' => 'Button text 2', 'type' => 'text'],
+			]
+		],
+		'Hero Marketing' => [
+			'id' => 'marketing',
+			'description' => 'Primary marketing copy and calls to action used in Hero sections[cite: 23].',
+			'fields' => [
+				'one_headline'         => ['label' => 'Headline',              'type' => 'text'],
+				'one_headline_support' => ['label' => 'Headline Support Copy', 'type' => 'textarea'],
+				'one_marketing_image'  => ['label' => 'Marketing Image URL',   'type' => 'media'],
+				'one_cta_text'         => ['label' => 'CTA text',              'type' => 'text'],
+			]
 		],
 		'Key Web Pages' => [
-			'one_page_about'         => [ 'label' => 'About',              'type' => 'page' ],
-			'one_page_blog'         => [ 'label' => 'Blog',              'type' => 'page' ],
-			'one_page_contact'         => [ 'label' => 'Contact',              'type' => 'page' ],
-			'one_page_sitemap'         => [ 'label' => 'Sitemap',              'type' => 'page' ],
-			'one_page_privacy'         => [ 'label' => 'Privacy',              'type' => 'page' ],
-			'one_page_terms'           => [ 'label' => 'Terms',                'type' => 'page' ],
+			'id' => 'businessinfo',
+			'description' => 'Select important web pages for links and navigation',
+			'fields' => [
+				'one_page_about'         => ['label' => 'About',              'type' => 'page'],
+				'one_page_blog'         => ['label' => 'Blog',              'type' => 'page'],
+				'one_page_contact'         => ['label' => 'Contact',              'type' => 'page'],
+				'one_page_sitemap'         => ['label' => 'Sitemap',              'type' => 'page'],
+				'one_page_privacy'         => ['label' => 'Privacy',              'type' => 'page'],
+				'one_page_terms'           => ['label' => 'Terms',                'type' => 'page'],
+			]
 		],
-		'Marketing' => [
-			'one_headline'         => [ 'label' => 'Headline',              'type' => 'text' ],
-			'one_headline_support' => [ 'label' => 'Headline Support Copy', 'type' => 'textarea' ],
-			'one_marketing_image'  => [ 'label' => 'Marketing Image URL',   'type' => 'media' ],
-			'one_cta_text'         => [ 'label' => 'CTA text',              'type' => 'text' ],
-		],
-		'Business Information' => [
-			'one_business_name'  => [ 'label' => 'Business Name',      'type' => 'text' ],
-			'one_business_phone' => [ 'label' => 'Phone (display)',     'type' => 'text' ],
-			'one_phone_web_ready'=> [ 'label' => 'Phone (digits only)', 'type' => 'text' ],
-			'one_business_email' => [ 'label' => 'Business Email',      'type' => 'email' ],
+		'Business Information (NAP)' => [
+			'id' => 'businessinfo',
+			'description' => 'Essential contact details. Ensure the web-ready phone contains digits only for click-to-call[cite: 23].',
+			'fields' => [
+				'one_business_name'  => ['label' => 'Business Name',      'type' => 'text'],
+				'one_business_phone' => ['label' => 'Phone (display)',     'type' => 'text'],
+				'one_phone_web_ready' => ['label' => 'Phone (digits only)', 'type' => 'text'],
+				'one_business_email' => ['label' => 'Business Email',      'type' => 'email'],
+			]
 		],
 		'Physical Address' => [
-			'one_street_address'   => [ 'label' => 'Street Address',        'type' => 'text' ],
-			'one_city'             => [ 'label' => 'City',                  'type' => 'text' ],
-			'one_state'            => [ 'label' => 'State / Province',      'type' => 'text' ],
-			'one_postal_code'      => [ 'label' => 'Postal / ZIP Code',     'type' => 'text' ],
-			'one_country'          => [ 'label' => 'Country Code',          'type' => 'text' ],
-			'one_latitude'         => [ 'label' => 'Latitude',              'type' => 'text' ],
-			'one_longitude'        => [ 'label' => 'Longitude',             'type' => 'text' ],
-			'one_google_map_url'   => [ 'label' => 'Google Map URL',        'type' => 'url' ],
-			'one_google_map_embed' => [ 'label' => 'Google Map Embed Code', 'type' => 'textarea', 'raw' => true ],
-		],
-		'Social Media' => [
-			'social-facebook'        => [ 'label' => 'Facebook',              'type' => 'url' ],
-			'social-instagram'       => [ 'label' => 'Instagram',             'type' => 'url' ],
-			'social-linkedin'        => [ 'label' => 'LinkedIn',              'type' => 'url' ],
-			'social-youtube'         => [ 'label' => 'YouTube',               'type' => 'url' ],
-			'social-twitter-x'       => [ 'label' => 'Twitter / X',           'type' => 'url' ],
-			'social-google-business' => [ 'label' => 'Google Business',       'type' => 'url' ],
-			'social-wordpress'       => [ 'label' => 'WordPress.org Profile', 'type' => 'url' ],
-			'social-yelp'            => [ 'label' => 'Yelp',                  'type' => 'url' ],
-			'social-tripadvisor'     => [ 'label' => 'TripAdvisor',           'type' => 'url' ],
-			'social-github'          => [ 'label' => 'GitHub',                'type' => 'url' ],
-		],
-		'Business Schema Details' => [
-			'one_price_range'   => [ 'label' => 'Price Range',    'type' => 'text' ],
-			'one_opening_hours' => [ 'label' => 'Opening Hours',  'type' => 'textarea' ],
+			'id' => 'physicaladdress',
+			'description' => 'Physical location data used for Local SEO and Google Maps integration[cite: 23].',
+			'fields' => [
+				'one_street_address'   => ['label' => 'Street Address',        'type' => 'text'],
+				'one_city'             => ['label' => 'City',                  'type' => 'text'],
+				'one_state'            => ['label' => 'State / Province',      'type' => 'text'],
+				'one_postal_code'      => ['label' => 'Postal / ZIP Code',     'type' => 'text'],
+				'one_country'          => ['label' => 'Country Code',          'type' => 'text'],
+				'one_latitude'         => ['label' => 'Latitude',              'type' => 'text'],
+				'one_longitude'        => ['label' => 'Longitude',             'type' => 'text'],
+				'one_google_map_url'   => ['label' => 'Google Map URL',        'type' => 'url'],
+				'one_google_map_embed' => ['label' => 'Google Map Embed Code', 'type' => 'textarea', 'raw' => true],
+			]
 		],
 		'Integrations' => [
-			'one_header_code'                    => [ 'label' => 'Header Code (meta tags)',      'type' => 'textarea', 'raw' => true ],
-			'one_g-google_analytics'             => [ 'label' => 'Google Analytics URL',        'type' => 'url' ],
-			'one_g-google_search_console'        => [ 'label' => 'Google Search Console URL',   'type' => 'url' ],
-			'one_google_search_console_insights' => [ 'label' => 'Search Console Insights URL', 'type' => 'url' ],
-			'one_looker_studio'                  => [ 'label' => 'Looker Studio Embed',         'type' => 'textarea', 'raw' => true ],
-			'one_bing_webmaster'                 => [ 'label' => 'Bing Webmaster URL',          'type' => 'url' ],
+			'id' => 'integrations',
+			'description' => 'Paste tracking scripts and meta tags here to be inserted into the site header[cite: 23].',
+			'fields' => [
+				'one_header_code'                    => ['label' => 'Header Code (meta tags)',      'type' => 'textarea', 'raw' => true],
+				'one_g-google_analytics'             => ['label' => 'Google Analytics URL',        'type' => 'url'],
+				'one_g-google_search_console'        => ['label' => 'Google Search Console URL',   'type' => 'url'],
+				'one_looker_studio'                  => ['label' => 'Looker Studio Embed',         'type' => 'textarea', 'raw' => true],
+			]
+		],
+		'Social Media' => [
+			'id' => 'socialmedia',
+			'description' => 'Links to your official social profiles. These help search engines verify your business authority.',
+			'fields' => [
+				// Global Styling for Icon Shortcodes
+				'social-icon-width'      => ['label' => 'Global Icon Width',  'type' => 'text', 'default' => '2.1em'],
+				'social-icon-height'     => ['label' => 'Global Icon Height', 'type' => 'text', 'default' => '2.1em'],
+				'social-icon-fill'       => ['label' => 'Global Icon Color',  'type' => 'text', 'default' => 'currentColor'],
+				// Profile Links
+				'social-facebook'        => ['label' => 'Facebook URL',         'type' => 'url'],
+				'social-instagram'       => ['label' => 'Instagram URL',        'type' => 'url'],
+				'social-linkedin'        => ['label' => 'LinkedIn URL',         'type' => 'url'],
+				'social-youtube'         => ['label' => 'YouTube URL',          'type' => 'url'],
+				'social-twitter-x'       => ['label' => 'Twitter / X URL',      'type' => 'url'],
+				'social-google-business' => ['label' => 'Google Business URL',  'type' => 'url'],
+				'social-yelp'            => ['label' => 'Yelp URL',             'type' => 'url'],
+				'social-github'          => ['label' => 'GitHub URL',           'type' => 'url'],
+			]
 		],
 	];
 }
-
 // ---------------------------------------------------------------------------
-// Sanitize a single field value based on its type and raw flag.
+// 3. Shortcode Handler (The "[sbo_field]" tool)
 // ---------------------------------------------------------------------------
-function sbo_sanitize_field( string $value, string $type, bool $raw ): string {
-	if ( $raw ) {
-		return wp_kses_post( $value );
-	}
-	return match ( $type ) {
-		'url'      => esc_url_raw( $value ),
-		'email'    => sanitize_email( $value ),
-		'page'     => esc_url_raw( $value ),
-		'textarea' => sanitize_textarea_field( $value ),
-		default    => sanitize_text_field( $value ),
-	};
-}
-
+add_shortcode('sbo_field', function ($atts) {
+	$a = shortcode_atts([
+		'name' => '',
+		'raw'  => 'false',
+	], $atts);
+	$val = sbo_get($a['name']);
+	return ($a['raw'] === 'true') ? $val : esc_html($val);
+});
 // ---------------------------------------------------------------------------
-// Admin menu.
+// Admin menu - Top Level + Submenus
 // ---------------------------------------------------------------------------
-add_action( 'admin_menu', function () {
-	add_options_page(
-		'SiteBuilderOne Settings',
-		'SiteBuilderOne',
+add_action('admin_menu', function () {
+	// 1. Create the Top Level Menu
+	add_menu_page(
+		'SiteBuilderOne',                // Page Title
+		'SiteBuilderOne',                // Menu Title
+		'manage_options',                // Capability
+		'sitebuilderone',                // Menu Slug
+		'sbo_render_admin_page',         // Callback for the "General" view
+		'dashicons-admin-site-alt3',     // Icon
+		80                               // Position
+	);
+	// 2. Add Submenu Items (Optional: break your schema into these)
+	add_submenu_page(
+		'sitebuilderone',                // Parent Slug
+		'General Settings',              // Page Title
+		'General Settings',              // Submenu Title
 		'manage_options',
-		'wp-sitebuilderone-lite',
+		'sitebuilderone',                // Same slug as parent for the first item
 		'sbo_render_admin_page'
 	);
-} );
+	add_submenu_page(
+		'sitebuilderone',
+		'Business Info',
+		'Business Info',
+		'manage_options',
+		'sbo-business-info',             // Unique slug for sub-section
+		'sbo_render_admin_page'          // You can use the same renderer!
+	);
+	add_submenu_page(
+		'sitebuilderone',				// Marketing
+		'Marketing',
+		'Marketing',
+		'manage_options',
+		'sbo-marketing-info',             // Unique slug for sub-section
+		'sbo_render_admin_page'          // You can use the same renderer!
+	);
 
-// ---------------------------------------------------------------------------
-// Enqueue admin CSS and JavaScript.
-// ---------------------------------------------------------------------------
-add_action( 'admin_enqueue_scripts', function ( string $hook ) {
-	if ( 'settings_page_wp-sitebuilderone-lite' !== $hook ) return;
-	wp_enqueue_style( 'sbo-admin', SBO_URL . 'assets/css/admin.css', [], SBO_VERSION );
-	wp_enqueue_script( 'sbo-admin', SBO_URL . 'assets/js/admin.js', [], SBO_VERSION, true );
-} );
-
-// ---------------------------------------------------------------------------
-// Save handler.
-// ---------------------------------------------------------------------------
-add_action( 'admin_post_sbo_save_settings', function () {
-	if ( ! current_user_can( 'manage_options' ) ) wp_die( 'Unauthorized' );
-	check_admin_referer( 'sbo_save_settings', 'sbo_nonce' );
-
-	$schema = sbo_get_field_schema();
-	$data   = [];
-
-	foreach ( $schema as $fields ) {
-		foreach ( $fields as $key => $meta ) {
-			$raw_value  = isset( $_POST['sbo_fields'][ $key ] ) ? wp_unslash( $_POST['sbo_fields'][ $key ] ) : '';
-			$data[ $key ] = sbo_sanitize_field( (string) $raw_value, $meta['type'], ! empty( $meta['raw'] ) );
-		}
-	}
-
-	update_option( SBO_OPTION_KEY, $data );
-
-	wp_safe_redirect( add_query_arg(
-		[ 'page' => 'wp-sitebuilderone-lite', 'updated' => '1' ],
-		admin_url( 'options-general.php' )
-	) );
-	exit;
-} );
-
-// ---------------------------------------------------------------------------
-// Admin page render.
-// ---------------------------------------------------------------------------
-function sbo_render_admin_page(): void {
-	if ( ! current_user_can( 'manage_options' ) ) return;
-
-	$schema  = sbo_get_field_schema();
-	$options = get_option( SBO_OPTION_KEY, [] );
-
-	// Build export URL (GET, nonce in query string).
-	$export_url = wp_nonce_url(
-		add_query_arg( 'action', 'sbo_export_csv', admin_url( 'admin-post.php' ) ),
-		'sbo_export_csv'
+		add_submenu_page(
+		'sitebuilderone',
+		'Design',
+		'Design',
+		'manage_options',
+		'sbo-settings-design',
+		'sbo_render_admin_page'
 	);
 
 
-
-
-
-
-	
-	?>
+	add_submenu_page(
+		'sitebuilderone',
+		'Pages',
+		'Pages',
+		'manage_options',
+		'sbo-website',             // Unique slug for sub-section
+		'sbo_render_admin_page'          // You can use the same renderer!
+	);
+	add_submenu_page(
+		'sitebuilderone',
+		'Social Media',
+		'Social Media',
+		'manage_options',
+		'sbo-social',
+		'sbo_render_admin_page'
+	);
+});
+// ---------------------------------------------------------------------------
+// 5. Admin Bar & Notices
+// ---------------------------------------------------------------------------
+add_action('admin_bar_menu', function (WP_Admin_Bar $bar) {
+	if (! current_user_can('manage_options')) return;
+	$bar->add_node([
+		'id'    => 'sbo-settings',
+		'title' => 'SiteBuilderOne',
+		'href'  => admin_url('admin.php?page=sitebuilderone') // Changed from options-general.php
+	]);
+	//	$bar->add_node(['id' => 'sbo-settings', 'title' => 'SiteBuilderOne', 'href' => admin_url('options-general.php?page=wp-sitebuilderone-lite')]);
+	$bar->add_node(['id' => 'sbo-edit-header', 'parent' => 'sbo-settings', 'title' => 'Edit Header', 'href' => home_url('/?lc_partial=header&lc_action_launch_editing=1')]);
+	$bar->add_node(['id' => 'sbo-edit-footer', 'parent' => 'sbo-settings', 'title' => 'Edit Footer', 'href' => home_url('/?lc_partial=footer&lc_action_launch_editing=1')]);
+}, 100);
+// ---------------------------------------------------------------------------
+// 6. Save Handler (Fixes the TypeError)
+// ---------------------------------------------------------------------------
+add_action('admin_post_sbo_save_settings', function () {
+	if (! current_user_can('manage_options')) wp_die('Unauthorized');
+	check_admin_referer('sbo_save_settings', 'sbo_nonce');
+	$schema = sbo_get_field_schema();
+	$data   = get_option(SBO_OPTION_KEY, []); // preserve fields from other sub-pages
+	$posted = $_POST['sbo_fields'] ?? [];
+	foreach ($schema as $section) {
+		$fields = $section['fields'] ?? [];
+		foreach ($fields as $key => $meta) {
+			if (! array_key_exists($key, $posted)) continue; // not on this form — leave untouched
+			$raw_value = wp_unslash($posted[$key]);
+			if (! empty($meta['raw'])) {
+				$data[$key] = wp_kses_post($raw_value);
+			} else {
+				$data[$key] = match ($meta['type']) {
+					'url'      => esc_url_raw($raw_value),
+					'email'    => sanitize_email($raw_value),
+					'textarea' => sanitize_textarea_field($raw_value),
+					'checkbox' => $raw_value ? '1' : '0',
+					default    => sanitize_text_field($raw_value),
+				};
+			}
+		}
+	}
+	update_option(SBO_OPTION_KEY, $data);
+	$referer = isset($_POST['_wp_http_referer'])
+		? wp_unslash($_POST['_wp_http_referer'])
+		: admin_url('admin.php?page=sitebuilderone');
+	wp_safe_redirect(add_query_arg(['updated' => '1'], $referer));
+	exit;
+});
+// ---------------------------------------------------------------------------
+// 7. Admin Page Renderer
+// ---------------------------------------------------------------------------
+function sbo_render_admin_page()
+{
+	$schema  = sbo_get_field_schema();
+	$options = get_option(SBO_OPTION_KEY, []);
+	// Determine which sub-section to show based on the URL 'page' parameter
+	$current_page = $_GET['page'] ?? 'sitebuilderone';
+	if ($current_page === 'sbo-business-info') {
+		$schema = array_intersect_key($schema, [
+			'Business Information (NAP)' => '', // Added (NAP) to match schema
+			'Physical Address'           => '',
+			
+		]);
+	} elseif ($current_page === 'sbo-social') {
+		$schema = array_intersect_key($schema, [
+			'Social Media' => ''
+		]);
+	} elseif ($current_page === 'sbo-website') {
+	$schema = array_intersect_key($schema, [
+		'Key Web Pages'              => ''  // Added this so your page selectors show up
+	]);
+	} elseif ($current_page === 'sbo-marketing-info') {
+		$schema = array_intersect_key($schema, [
+			'Hero Marketing' => '', // Changed from 'Marketing' to match schema
+		]);
+} elseif ($current_page === 'sbo-settings-design') {
+		$schema = array_intersect_key($schema, [
+			'Global Footer' => '', // Changed from 'Marketing' to match schema
+		]);		
+	} else {
+		$schema = array_intersect_key($schema, [
+			'Branding'       => '',
+			
+			'Integrations'   => ''
+		]);
+	}
+	//$schema  = sbo_get_field_schema();
+	//$options = get_option(SBO_OPTION_KEY, []);
+?>
 	<div class="wrap sbo-wrap">
 		<h1>SiteBuilderOne Settings</h1>
-
-		<?php if ( isset( $_GET['updated'] ) ) : ?>
-			<div class="notice notice-success is-dismissible"><p>Settings saved.</p></div>
-		<?php endif; ?>
-
-		<?php if ( isset( $_GET['imported'] ) ) : ?>
+		<?php if (isset($_GET['updated'])) : ?>
 			<div class="notice notice-success is-dismissible">
-				<p><?php echo esc_html( (int) $_GET['imported'] ) . ' field(s) imported successfully.'; ?></p>
+				<p>Settings saved.</p>
 			</div>
 		<?php endif; ?>
-
-		<?php if ( isset( $_GET['sbo_error'] ) ) : ?>
-			<div class="notice notice-error is-dismissible">
-				<p>
-				<?php
-				$err = sanitize_key( $_GET['sbo_error'] );
-				echo 'no_file' === $err ? 'No CSV file was uploaded.' : 'Import failed. Please check your CSV and try again.';
-				?>
-				</p>
-			</div>
-		<?php endif; ?>
-
-		<!-- Main settings form -->
-		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+		<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
 			<input type="hidden" name="action" value="sbo_save_settings">
-			<?php wp_nonce_field( 'sbo_save_settings', 'sbo_nonce' ); ?>
-
-			<?php foreach ( $schema as $section => $fields ) : ?>
-				<h2 class="sbo-section-heading"><?php echo esc_html( $section ); ?></h2>
-				<table class="form-table sbo-fields-table" role="presentation">
+			<?php wp_nonce_field('sbo_save_settings', 'sbo_nonce'); ?>
+			<?php foreach ($schema as $title => $data) : ?>
+				<h2 class="sbo-section-heading"><?php echo esc_html($title); ?></h2>
+				<?php if (isset($data['description'])) : ?>
+					<p class="description" style="margin-bottom:1.5em; font-size:15px; color:#666; font-style:italic;">
+						<?php echo esc_html($data['description']); ?>
+					</p>
+				<?php endif; ?>
+				<table class="form-table sbo-fields-table">
 					<tbody>
-					<?php foreach ( $fields as $key => $meta ) :
-						$val     = $options[ $key ] ?? '';
-						$is_raw  = ! empty( $meta['raw'] );
-						$type    = $meta['type'];
-						$html_id = 'sbo-field-' . sanitize_html_class( $key );
-					?>
-						<tr>
-							<th scope="row">
-								<label for="<?php echo esc_attr( $html_id ); ?>">
-									<?php echo esc_html( $meta['label'] ); ?>
-								</label>
-							</th>
-							<td>
-								<?php if ( 'textarea' === $type ) : ?>
-									<textarea
-										id="<?php echo esc_attr( $html_id ); ?>"
-										name="sbo_fields[<?php echo esc_attr( $key ); ?>]"
-										rows="<?php echo $is_raw ? 6 : 4; ?>"
-										class="large-text<?php echo $is_raw ? ' code' : ''; ?>"
-									><?php echo esc_textarea( $val ); ?></textarea>
-									<?php if ( $is_raw ) : ?>
-										<p class="description sbo-field-hint">HTML accepted (iframe, meta tags). Scripts are stripped.</p>
+						<?php
+						$fields = $data['fields'] ?? [];
+						foreach ($fields as $key => $meta) :
+							$val     = $options[$key] ?? '';
+							$type    = $meta['type'];
+							$is_raw  = ! empty($meta['raw']);
+							$html_id = 'sbo-field-' . sanitize_html_class($key);
+						?>
+							<tr>
+								<th scope="row">
+									<label for="<?php echo esc_attr($html_id); ?>">
+										<?php echo esc_html($meta['label']); ?>
+									</label>
+								</th>
+								<td>
+									<?php if ('textarea' === $type) : ?>
+										<textarea id="<?php echo $html_id; ?>" name="sbo_fields[<?php echo $key; ?>]" rows="4" class="large-text <?php echo $is_raw ? 'code' : ''; ?>"><?php echo esc_textarea($val); ?></textarea>
+										<?php if ($is_raw) : ?>
+											<p class="description">HTML accepted. Scripts are stripped for security.</p>
+										<?php endif; ?>
+									<?php elseif ('checkbox' === $type) : ?>
+										<input type="checkbox" id="<?php echo $html_id; ?>" name="sbo_fields[<?php echo $key; ?>]" value="1" <?php checked($val, 1); ?>>
+									<?php elseif ('page' === $type) :
+										$pages = get_pages(['sort_column' => 'menu_order', 'sort_order' => 'asc']); ?>
+										<select id="<?php echo $html_id; ?>" name="sbo_fields[<?php echo $key; ?>]" class="regular-text">
+											<option value="">— Select a page —</option>
+											<?php foreach ($pages as $page) :
+												$page_url = get_permalink($page->ID); ?>
+												<option value="<?php echo esc_attr($page_url); ?>" <?php selected($val, $page_url); ?>>
+													<?php echo esc_html($page->post_title); ?>
+												</option>
+											<?php endforeach; ?>
+										</select>
+										<?php if ($val) : ?>
+											<a href="<?php echo esc_url($val); ?>" target="_blank" class="button button-small" style="margin-left:5px;">Visit ↗</a>
+										<?php endif; ?>
+									<?php elseif ('media' === $type) : ?>
+										<div style="display:flex; align-items:center; gap:8px;">
+											<input type="text" id="<?php echo $html_id; ?>" name="sbo_fields[<?php echo $key; ?>]" value="<?php echo esc_attr($val); ?>" class="regular-text sbo-media-url">
+											<button type="button" class="button sbo-media-picker" data-target="<?php echo $html_id; ?>">Choose Image</button>
+										</div>
+										<?php if ($val) : ?>
+											<p><img src="<?php echo esc_url($val); ?>" style="max-width:200px; max-height:80px; margin-top:8px; border:1px solid #ccd0d4; border-radius:4px;"></p>
+										<?php endif; ?>
+									<?php else : ?>
+										<input type="<?php echo esc_attr($type); ?>" id="<?php echo $html_id; ?>" name="sbo_fields[<?php echo $key; ?>]" value="<?php echo esc_attr($val); ?>" class="regular-text">
 									<?php endif; ?>
-								<?php elseif ( 'page' === $type ) :
-    $pages = get_pages( [ 'sort_column' => 'menu_order', 'sort_order' => 'asc' ] );
-?>
-    <select
-        id="<?php echo esc_attr( $html_id ); ?>"
-        name="sbo_fields[<?php echo esc_attr( $key ); ?>]"
-        class="regular-text"
-    >
-        <option value="">— Select a page —</option>
-        <?php foreach ( $pages as $page ) :
-            $page_url = get_permalink( $page->ID );
-        ?>
-            <option value="<?php echo esc_attr( $page_url ); ?>"
-                <?php selected( $val, $page_url ); ?>>
-                <?php echo esc_html( $page->post_title ); ?>
-            </option>
-        <?php endforeach; ?>
-    </select>
-    <?php if ( $val ) : ?>
-        <a href="<?php echo esc_url( $val ); ?>" target="_blank" class="button button-small" style="margin-left:6px;">Visit ↗</a>
-    <?php endif; ?>
-
-
-	<?php elseif ( 'media' === $type ) : ?>
-    <div style="display:flex;align-items:center;gap:8px;">
-        <input
-            type="text"
-            id="<?php echo esc_attr( $html_id ); ?>"
-            name="sbo_fields[<?php echo esc_attr( $key ); ?>]"
-            value="<?php echo esc_attr( $val ); ?>"
-            class="regular-text sbo-media-url"
-        >
-        <button type="button"
-            class="button sbo-media-picker"
-            data-target="<?php echo esc_attr( $html_id ); ?>">
-            Choose Image
-        </button>
-    </div>
-    <?php if ( $val ) : ?>
-        <p><img src="<?php echo esc_url( $val ); ?>"
-            style="max-width:200px;max-height:80px;margin-top:6px;border:1px solid #dcdcde;border-radius:3px;"></p>
-    <?php endif; ?>
-
-
-<?php else : ?>
-    <input
-        type="<?php echo esc_attr( $type ); ?>"
-        id="<?php echo esc_attr( $html_id ); ?>"
-        name="sbo_fields[<?php echo esc_attr( $key ); ?>]"
-        value="<?php echo esc_attr( $val ); ?>"
-        class="regular-text"
-    >
-<?php endif; ?>
-
-								<?php if ( '' !== $val ) : ?>
-									<p class="description sbo-shortcode-ref">
-										<strong>Shortcode:</strong>
-										<code class="sbo-shortcode-code">[sbo_field name="<?php echo esc_attr( $key ); ?>"<?php echo $is_raw ? ' raw="true"' : ''; ?>]</code>
-										<button type="button" class="button button-small sbo-copy-shortcode" data-shortcode="[sbo_field name=&quot;<?php echo esc_attr( $key ); ?>&quot;<?php echo $is_raw ? ' raw=&quot;true&quot;' : ''; ?>]">Copy</button>
-									</p>
-								<?php endif; ?>
-							</td>
-						</tr>
-					<?php endforeach; ?>
+									<?php if ($val !== '') : ?>
+										<p class="description sbo-shortcode-ref" style="margin-top:8px;">
+											<strong>Shortcode:</strong>
+											<code class="sbo-shortcode-code">[sbo_field name="<?php echo esc_attr($key); ?>"<?php echo $is_raw ? ' raw="true"' : ''; ?>]</code>
+											<button type="button" class="button button-small sbo-copy-shortcode" data-shortcode='[sbo_field name="<?php echo esc_attr($key); ?>"<?php echo $is_raw ? ' raw="true"' : ''; ?>]'>Copy</button>
+										</p>
+									<?php endif; ?>
+								</td>
+							</tr>
+						<?php endforeach; ?>
 					</tbody>
 				</table>
 			<?php endforeach; ?>
-
-			<?php submit_button( 'Save All Settings' ); ?>
+			<?php submit_button('Save All SiteBuilderOne Settings'); ?>
 		</form>
-
-		<!-- CSV import/export -->
-		<div class="sbo-csv-box">
-			<h2>CSV Import / Export</h2>
-
-			<h3>Export</h3>
-			<p>Download all current settings as a CSV file.</p>
-			<a href="<?php echo esc_url( $export_url ); ?>" class="button button-secondary">Export CSV</a>
-
-			<h3>Import</h3>
-			<p>Upload a CSV file matching the <code>Section,Field,Value</code> format to populate settings. Existing values not present in the CSV are kept.</p>
-			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" enctype="multipart/form-data">
-				<input type="hidden" name="action" value="sbo_import_csv">
-				<?php wp_nonce_field( 'sbo_import_csv', 'sbo_import_nonce' ); ?>
-				<input type="file" name="sbo_csv_file" accept=".csv">
-				<?php submit_button( 'Import CSV', 'secondary', 'sbo_import_submit', false ); ?>
-			</form>
-		</div>
 	</div>
-	<?php
+<?php
 }
+add_action('admin_enqueue_scripts', function (string $hook) {
+	// Update this check to look for your new menu slugs
+	if (strpos($hook, 'sitebuilderone') === false && strpos($hook, 'sbo-') === false) return;
+	wp_enqueue_media();
+	wp_enqueue_style('sbo-admin', SBO_URL . 'assets/css/admin.css', [], SBO_VERSION);
+	wp_enqueue_script('sbo-admin', SBO_URL . 'assets/js/admin.js', ['jquery'], SBO_VERSION, true);
+});
