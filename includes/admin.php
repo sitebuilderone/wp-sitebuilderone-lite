@@ -17,7 +17,7 @@ function sbo_get_field_schema(): array
 			'description' => 'Core identity elements like logos and SEO keywords used across the site header and metadata[cite: 23].',
 			'fields' => [
 				'website_name'             => ['label' => 'Website Name',              'type' => 'text'],
-				'one_home_url'             => ['label' => 'Home URL',                  'type' => 'page'],
+				'one_home_url'             => ['label' => 'Home URL',                  'type' => 'text'],
 				'one_business_logo'        => ['label' => 'Business Logo URL',         'type' => 'media'],
 				'one_business_description' => ['label' => 'Business Description',      'type' => 'textarea'],
 				'one_business_keywords'    => ['label' => 'Business Keywords',         'type' => 'text'],
@@ -31,12 +31,18 @@ function sbo_get_field_schema(): array
 				'one_footer_desc'          => ['label' => 'Footer business description', 'type' => 'textarea', 'raw' => true],
 				'one_footer_01_title'      => ['label' => 'Footer header 01 title',      'type' => 'text'],
 				'one_footer_02_title'      => ['label' => 'Footer header 02 title',      'type' => 'text'],
+			]
+		],
+		'Sticky Footer' => [
+			'id' => 'stickyfooter',
+			'description' => 'Design - sticky footer CTA',
+			'fields' => [
 				'one_footer_sticky_enable' => ['label' => 'Enable Sticky Mobile Footer', 'type' => 'checkbox'],
 				'one_footer_sticky_text'   => ['label' => 'Button text', 'type' => 'text'],
 				'one_footer_sticky_url'   => ['label' => 'Button URL', 'type' => 'text'],
 				'one_footer_sticky_text_2'   => ['label' => 'Button text 2', 'type' => 'text'],
 			]
-		],
+		],		
 		'Hero Marketing' => [
 			'id' => 'marketing',
 			'description' => 'Primary marketing copy and calls to action used in Hero sections[cite: 23].',
@@ -271,6 +277,7 @@ function sbo_render_admin_page()
 } elseif ($current_page === 'sbo-settings-design') {
 		$schema = array_intersect_key($schema, [
 			'Global Footer' => '', // Changed from 'Marketing' to match schema
+			'Sticky Footer' => '', // Changed from 'Marketing' to match schema
 		]);		
 	} else {
 		$schema = array_intersect_key($schema, [

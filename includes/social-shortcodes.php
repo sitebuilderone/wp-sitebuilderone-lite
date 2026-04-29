@@ -118,6 +118,43 @@ function sbo_render_social_shortcode( $atts, $tag ) {
 }
 
 /**
+ * Aggregate shortcode to render all configured social icons.
+ * Displays only icons whose corresponding URL value exists.
+ * Use in templates/content:
+* [sbo_social_all]
+* Optional attributes: [sbo_social_all class="my-social-wrap" separator=" "]
+*/
+
+function sbo_render_all_social_shortcodes( $atts ) {
+    $a = shortcode_atts(
+        [
+            'class'     => 'sbo-social-links',
+            'separator' => '',
+        ],
+        $atts
+    );
+
+    $output = [];
+
+    foreach ( array_keys( sbo_social_icon_registry() ) as $tag ) {
+        $html = sbo_render_social_shortcode( [], $tag );
+        if ( '' !== $html ) {
+            $output[] = $html;
+        }
+    }
+
+    if ( empty( $output ) ) {
+        return '';
+    }
+
+    return sprintf(
+        '<div class="%s">%s</div>',
+        esc_attr( $a['class'] ),
+        implode( $a['separator'], $output )
+    );
+}
+
+/**
  * Register Shortcodes on Init
  */
 add_action( 'init', function() {
@@ -126,5 +163,7 @@ add_action( 'init', function() {
             return sbo_render_social_shortcode($atts, $tag);
         });
     }
+
+    add_shortcode( 'sbo_social_all', 'sbo_render_all_social_shortcodes' );
 });
 

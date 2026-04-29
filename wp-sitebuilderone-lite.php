@@ -53,3 +53,15 @@ function move_admin_bar_to_bottom() {
 add_action('wp_head', 'move_admin_bar_to_bottom');
 add_action('admin_head', 'move_admin_bar_to_bottom');
 
+
+add_action('init', 'sbo_enable_tags_for_pages');
+function sbo_enable_tags_for_pages() {
+    register_taxonomy_for_object_type('post_tag', 'page');
+}
+
+// Optional: Ensure tags are included in search results for pages
+add_action('pre_get_posts', function($query) {
+    if ($query->is_tag() && $query->is_main_query()) {
+        $query->set('post_type', ['post', 'page']);
+    }
+});
