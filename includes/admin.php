@@ -24,6 +24,17 @@ function sbo_get_field_schema(): array
 				'one_banner_image'         => ['label' => 'Banner Image URL',          'type' => 'url'],
 			]
 		],
+		'Header' => [
+			'id' => 'header',
+			'description' => 'Global header information',
+			'fields' => [
+				'one_header_cta_btn_text'  => ['label' => 'Button text', 'type' => 'text'],
+				'one_header_cta_URL'         => ['label' => 'CTA page',              'type' => 'page'],
+				'one_header_logo_h'         => ['label' => 'Logo height (px)',       'type' => 'text'],
+				'one_header_logo_w'         => ['label' => 'Logo width (px)',       'type' => 'text'],
+
+			]
+		],
 		'Global Footer' => [
 			'id' => 'footer',
 			'description' => 'Global footer information',
@@ -276,6 +287,7 @@ function sbo_render_admin_page()
 		]);
 } elseif ($current_page === 'sbo-settings-design') {
 		$schema = array_intersect_key($schema, [
+			'Header' => '', // Changed from 'Marketing' to match schema
 			'Global Footer' => '', // Changed from 'Marketing' to match schema
 			'Sticky Footer' => '', // Changed from 'Marketing' to match schema
 		]);		

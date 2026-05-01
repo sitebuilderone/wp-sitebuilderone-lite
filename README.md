@@ -37,6 +37,22 @@ Lightweight WordPress plugin for local business websites. Stores business data (
 
 **Total: 36 fields**
 
+## New website setup guide
+
+- Settings > Media: Turn 'off' Organize my uploads into month- and year-based folders
+
+
+## Usage
+
+### Faq
+
+Faq's are ordered by tags
+To use them on a web page, call the following shortcode with related tag
+```
+[sbo_faq tag="web-design"]
+```
+
+
 ## References
 
 - [Google Local Business Schema](https://developers.google.com/search/docs/appearance/structured-data/local-business)

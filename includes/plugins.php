@@ -54,6 +54,11 @@ add_action( 'admin_notices', function () {
     'slug'  => 'advanced-google-recaptcha',
     'check' => 'advanced-google-recaptcha/advanced-google-recaptcha.php',
 ],
+[
+    'name'  => '[Local dev] GitHub Deployer',
+    'slug'  => 'deployer-for-git',
+    'check' => 'deployer-for-git/deployer-for-git.php',
+],
 
 
     ];
@@ -81,6 +86,11 @@ add_action( 'admin_notices', function () {
             <?php foreach ( $missing as $item ) : ?>
                 <li><?php echo $item; ?></li>
             <?php endforeach; ?>
+        </ul>
+        <p>Custom SiteBuilderOne plugins:</p>
+        <ul style="list-style:disc;margin-left:1.5em;">
+            <li><a href="https://github.com/sitebuilderone/wp-sb1-faq" target="_blank">FAQ</a></li>
+            <li><a href="https://github.com/sitebuilderone/wp-sb1-services" target="_blank">Services</a></li>   
         </ul>
     </div>
     <?php

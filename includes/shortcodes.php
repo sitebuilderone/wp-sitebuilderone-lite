@@ -118,7 +118,10 @@ add_shortcode( 'sbo_custom_logo', function ( $atts ) {
 
     // Strip the scheme + host so LiveCanvas doesn't double-prefix it.
     $parsed = wp_parse_url( $url );
-    return $parsed['path'] ?? $url;
+    if ( isset( $parsed['path'] ) ) {
+        return ltrim( $parsed['path'], '/' );
+    }
+    return $url;
 } );
 
 
@@ -139,6 +142,304 @@ add_shortcode( 'sbo_url', function ( $atts ) {
     return esc_url_raw( $url );
 } );
 
+
+/**
+ * [sbo_header_cta_url]
+ * Returns the path-only URL for the Header CTA page field.
+ * Strips scheme + host so LiveCanvas doesn't double-prefix it.
+ */
+add_shortcode( 'sbo_header_cta_url', function() {
+    $url = sbo_get( 'one_header_cta_URL' );
+    if ( ! $url ) return '';
+    $parsed = wp_parse_url( $url );
+    $path   = ltrim( $parsed['path'] ?? '/', '/' );
+    return $path . ( isset( $parsed['query'] ) ? '?' . $parsed['query'] : '' );
+} );
+
+/**
+ * [sbo_header_logo_dimensions]
+ * Returns HTML width/height attributes from header logo fields.
+ * Example output: width="60" height="24"
+ */
+add_shortcode( 'sbo_header_logo_dimensions', function() {
+    $width  = absint( sbo_get( 'one_header_logo_w' ) );
+    $height = absint( sbo_get( 'one_header_logo_h' ) );
+
+    // Backward-compatible fallbacks for alternate field keys.
+    if ( $width <= 0 ) {
+        $width = absint( sbo_get( 'one_header_logo_width' ) );
+    }
+    if ( $height <= 0 ) {
+        $height = absint( sbo_get( 'one_header_logo_height' ) );
+    }
+
+    $attrs = [];
+    if ( $width > 0 ) {
+        $attrs[] = sprintf( 'width="%d"', $width );
+    }
+    if ( $height > 0 ) {
+        $attrs[] = sprintf( 'height="%d"', $height );
+    }
+
+    return implode( ' ', $attrs );
+} );
+
+/**
+ * [sbo_header_logo_img]
+ * Returns a complete <img> tag for the site logo to avoid shortcode-in-attribute parsing issues.
+ */
+add_shortcode( 'sbo_header_logo_img', function( $atts ) {
+    $atts = shortcode_atts(
+        [
+            'size'    => 'full',
+            'class'   => 'd-inline-block align-top',
+            'alt'     => '',
+            'loading' => 'lazy',
+        ],
+        $atts,
+        'sbo_header_logo_img'
+    );
+
+    $logo_id = get_theme_mod( 'custom_logo' );
+    if ( ! $logo_id ) return '';
+
+    $src = wp_get_attachment_image_url( $logo_id, $atts['size'] );
+    if ( ! $src ) return '';
+
+    $width  = absint( sbo_get( 'one_header_logo_w' ) );
+    $height = absint( sbo_get( 'one_header_logo_h' ) );
+
+    if ( $width <= 0 ) {
+        $width = absint( sbo_get( 'one_header_logo_width' ) );
+    }
+    if ( $height <= 0 ) {
+        $height = absint( sbo_get( 'one_header_logo_height' ) );
+    }
+
+    $alt = '' !== trim( (string) $atts['alt'] )
+        ? (string) $atts['alt']
+        : sbo_get( 'website_name', get_bloginfo( 'name' ) );
+
+    $html = sprintf(
+        '<img src="%s" class="%s" alt="%s" loading="%s"',
+        esc_url( $src ),
+        esc_attr( $atts['class'] ),
+        esc_attr( $alt ),
+        esc_attr( $atts['loading'] )
+    );
+
+    if ( $width > 0 ) {
+        $html .= sprintf( ' width="%d"', $width );
+    }
+    if ( $height > 0 ) {
+        $html .= sprintf( ' height="%d"', $height );
+    }
+
+    $html .= ' />';
+    return $html;
+} );
+
+/**
+ * [sbo_faq]
+ * Renders FAQ items from the 'faq' custom post type as HTML.
+ *
+ * Attributes:
+ *   count — max number of FAQs (default: -1 = all)
+ *   tag   — filter by tag slug, comma-separated for multiple (default: '' = all)
+ *
+ * Examples:
+ *   [sbo_faq]
+ *   [sbo_faq count="6"]
+ *   [sbo_faq tag="web-design"]
+ *   [sbo_faq tag="web-design,seo" count="6"]
+ */
+add_shortcode( 'sbo_faq', function( $atts ) {
+    $atts = shortcode_atts(
+        [
+            'count'  => -1,
+            'tag'    => '',
+            'schema' => 'true',  // Set to "false" to skip injecting JSON-LD into <head>.
+        ],
+        $atts,
+        'sbo_faq'
+    );
+
+    $args = [
+        'post_type'      => 'faq',
+        'posts_per_page' => intval( $atts['count'] ),
+        'post_status'    => 'publish',
+        'orderby'        => 'menu_order',
+        'order'          => 'ASC',
+        'no_found_rows'  => true,
+    ];
+
+    if ( '' !== trim( $atts['tag'] ) ) {
+        $args['tax_query'] = [ [
+            'taxonomy' => 'post_tag',
+            'field'    => 'slug',
+            'terms'    => array_map( 'trim', explode( ',', $atts['tag'] ) ),
+        ] ];
+    }
+
+    $query = new WP_Query( $args );
+
+    if ( ! $query->have_posts() ) {
+        return '';
+    }
+
+    $schema_script = '';
+    // Optionally inject FAQPage schema. If wp_head has already fired, fall back to inline output.
+    if ( 'true' === strtolower( $atts['schema'] ) ) {
+        $json = sbo_build_faq_schema( $args );
+        if ( $json ) {
+            $schema_script = '<script type="application/ld+json">' . $json . '</script>';
+            if ( did_action( 'wp_head' ) === 0 ) {
+                add_action( 'wp_head', function() use ( $schema_script ) {
+                    echo $schema_script . "\n";
+                } );
+                $schema_script = '';
+            }
+        }
+    }
+
+    $html = '';
+    foreach ( $query->posts as $post ) {
+        $title   = esc_html( $post->post_title );
+        $content = apply_filters( 'the_content', $post->post_content );
+
+        $html .= '<div class="lc-block mb-5">';
+        $html .= '<p class="h4">' . $title . '</p>';
+        $html .= '<div>' . $content . '</div>';
+        $html .= '</div>';
+    }
+
+    wp_reset_postdata();
+
+    return $schema_script . $html;
+} );
+
+/**
+ * Shared helper: builds the FAQPage schema array from WP_Query args.
+ * Returns the JSON string or empty string if no results.
+ *
+ * @param array $args WP_Query args (post_type, tax_query, etc. already set).
+ * @return string JSON-encoded schema or ''.
+ */
+function sbo_build_faq_schema( array $args ): string {
+    $query = new WP_Query( $args );
+    if ( ! $query->have_posts() ) {
+        return '';
+    }
+
+    $main_entity = [];
+    foreach ( $query->posts as $post ) {
+        $question = wp_strip_all_tags( $post->post_title );
+        $answer   = wp_strip_all_tags( apply_filters( 'the_content', $post->post_content ) );
+        $answer   = preg_replace( '/\s+/', ' ', trim( $answer ) );
+
+        if ( '' === $question || '' === $answer ) {
+            continue;
+        }
+
+        $main_entity[] = [
+            '@type'          => 'Question',
+            'name'           => $question,
+            'acceptedAnswer' => [
+                '@type' => 'Answer',
+                'text'  => $answer,
+            ],
+        ];
+    }
+
+    if ( empty( $main_entity ) ) {
+        return '';
+    }
+
+    return wp_json_encode(
+        [
+            '@context'   => 'https://schema.org',
+            '@type'      => 'FAQPage',
+            'mainEntity' => $main_entity,
+        ],
+        JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+    );
+}
+
+/**
+ * Builds WP_Query args from sbo_faq shortcode atts (shared by both schema shortcodes).
+ */
+function sbo_faq_query_args( array $atts ): array {
+    $args = [
+        'post_type'      => 'faq',
+        'posts_per_page' => intval( $atts['count'] ),
+        'post_status'    => 'publish',
+        'orderby'        => 'menu_order',
+        'order'          => 'ASC',
+        'no_found_rows'  => true,
+    ];
+
+    if ( '' !== trim( $atts['tag'] ) ) {
+        $args['tax_query'] = [ [
+            'taxonomy' => 'post_tag',
+            'field'    => 'slug',
+            'terms'    => array_map( 'trim', explode( ',', $atts['tag'] ) ),
+        ] ];
+    }
+
+    return $args;
+}
+
+/**
+ * [sbo_faq_schema_head]
+ * Registers FAQ schema to be injected into <head> via wp_head.
+ * Place this shortcode anywhere on the page — outputs nothing inline.
+ *
+ * Attributes:
+ *   count — max number of FAQs (default: -1 = all)
+ *   tag   — filter by tag slug, comma-separated (default: '' = all)
+ *
+ * Examples:
+ *   [sbo_faq_schema_head tag="web-design"]
+ *   [sbo_faq_schema_head tag="web-design,seo" count="6"]
+ */
+add_shortcode( 'sbo_faq_schema_head', function( $atts ) {
+    $atts = shortcode_atts( [ 'count' => -1, 'tag' => '' ], $atts, 'sbo_faq_schema_head' );
+
+    add_action( 'wp_head', function() use ( $atts ) {
+        $json = sbo_build_faq_schema( sbo_faq_query_args( $atts ) );
+        if ( $json ) {
+            echo '<script type="application/ld+json">' . $json . '</script>' . "\n";
+        }
+    } );
+
+    return ''; // No inline output.
+} );
+
+/**
+ * [sbo_faq_schema]
+ * Outputs a <script type="application/ld+json"> FAQPage schema block inline.
+ * Use [sbo_faq_schema_head] instead to inject into <head>.
+ *
+ * Attributes:
+ *   count — max number of FAQs to include (default: -1 = all)
+ *   tag   — filter by tag slug, comma-separated (default: '' = all)
+ *
+ * Examples:
+ *   [sbo_faq_schema]
+ *   [sbo_faq_schema count="6"]
+ *   [sbo_faq_schema tag="web-design"]
+ *   [sbo_faq_schema tag="web-design,seo" count="6"]
+ */
+add_shortcode( 'sbo_faq_schema', function( $atts ) {
+    $atts = shortcode_atts( [ 'count' => -1, 'tag' => '' ], $atts, 'sbo_faq_schema' );
+
+    $json = sbo_build_faq_schema( sbo_faq_query_args( $atts ) );
+    if ( ! $json ) {
+        return '';
+    }
+
+    return '<script type="application/ld+json">' . $json . '</script>';
+} );
 
 add_shortcode('sbo_map_link', function() {
     // 1. Fetch the data using the logic your other shortcodes use
