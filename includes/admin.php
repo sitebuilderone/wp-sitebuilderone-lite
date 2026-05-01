@@ -209,6 +209,14 @@ add_action('admin_menu', function () {
 		'sbo-social',
 		'sbo_render_admin_page'
 	);
+	add_submenu_page(
+		'sitebuilderone',
+		'Set up guide',
+		'Set up guide',
+		'manage_options',
+		'sbo-setup-guide',
+		'sbo_render_setup_guide'
+	);
 });
 // ---------------------------------------------------------------------------
 // 5. Admin Bar & Notices
@@ -385,6 +393,8 @@ function sbo_render_admin_page()
 	</div>
 <?php
 }
+// sbo_render_setup_guide() lives in includes/setup-guide.php
+
 add_action('admin_enqueue_scripts', function (string $hook) {
 	// Update this check to look for your new menu slugs
 	if (strpos($hook, 'sitebuilderone') === false && strpos($hook, 'sbo-') === false) return;

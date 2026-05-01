@@ -26,6 +26,7 @@ add_action( 'plugins_loaded', function () {
     require_once SBO_DIR . 'includes/plugins.php';
     require_once SBO_DIR . 'includes/pages.php';
     require_once SBO_DIR . 'includes/schema-org.php';
+    require_once SBO_DIR . 'includes/setup-guide.php';
 } 
 );
 
