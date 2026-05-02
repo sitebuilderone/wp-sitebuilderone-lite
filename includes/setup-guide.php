@@ -69,6 +69,14 @@ function sbo_render_setup_guide() {
 
 	<div class="sbo-guide">
 
+			<!-- ── STEP 1 ────────────────────────────────────────────── -->
+		<h2>New website</h2>
+		<div class="sbo-step">
+			<p><span class="sbo-step-num">1</span> Search & add new plugin for 'Deployer for Git'</p>
+			<p><span class="sbo-step-num">2</span> </p>
+			<p><span class="sbo-step-num">3</span> No build step is required. There is no <code>npm install</code> or <code>composer install</code> — just activate and go.</p>
+		</div>
+
 		<!-- ── STEP 1 ────────────────────────────────────────────── -->
 		<h2>Step 1 — Activate &amp; confirm the plugin is running</h2>
 		<div class="sbo-step">
@@ -170,7 +178,8 @@ function sbo_render_setup_guide() {
 			<code>[sbo_social_facebook]</code>&nbsp;
 			<code>[sbo_social_instagram]</code>&nbsp;
 			<code>[sbo_social_linkedin]</code>&nbsp;
-			<code>[sbo_social_youtube]</code>
+			<code>[sbo_social_youtube]</code>&nbsp;
+			<code>[sbo_social_all]</code>
 			<p style="margin-top:.7em;">Each shortcode accepts <code>width</code>, <code>height</code>, <code>fill</code>, and <code>class</code> attributes.</p>
 			<?php echo sbo_guide_field_status( [
 				'social-facebook'        => 'Facebook URL',
@@ -179,8 +188,17 @@ function sbo_render_setup_guide() {
 				'social-youtube'         => 'YouTube URL',
 				'social-twitter-x'       => 'Twitter / X URL',
 				'social-google-business' => 'Google Business URL',
+				'social-pinterest'       => 'Pinterest URL',
+				'social-bing'            => 'Bing URL',
+				'social-tiktok'          => 'TikTok URL',
+				'social-snapchat'        => 'Snapchat URL',
+				'social-reddit'          => 'Reddit URL',
+				'social-wordpress'       => 'WordPress URL',
+				'social-whatsapp'        => 'WhatsApp URL',
 				'social-yelp'            => 'Yelp URL',
+				'social-tripadvisor'     => 'TripAdvisor URL',
 				'social-github'          => 'GitHub URL',
+				'social-bbb'             => 'BBB URL',
 			], 'sbo-social' ); ?>
 		</div>
 

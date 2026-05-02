@@ -61,8 +61,17 @@ function sbo_generate_schema_org() {
 		'social-youtube'         => 'https://www.youtube.com/',
 		'social-twitter-x'       => 'https://twitter.com/',
 		'social-google-business' => '',
+		'social-pinterest'       => 'https://www.pinterest.com/',
+		'social-bing'            => 'https://www.bing.com/',
+		'social-tiktok'          => 'https://www.tiktok.com/',
+		'social-snapchat'        => 'https://www.snapchat.com/',
+		'social-reddit'          => 'https://www.reddit.com/',
+		'social-wordpress'       => 'https://profiles.wordpress.org/',
+		'social-whatsapp'        => 'https://wa.me/',
 		'social-yelp'            => 'https://www.yelp.com/',
+		'social-tripadvisor'     => 'https://www.tripadvisor.com/',
 		'social-github'          => 'https://www.github.com/',
+		'social-bbb'             => 'https://www.bbb.org/',
 	];
 
 	foreach ( $social_fields as $field => $base_url ) {

@@ -126,8 +126,17 @@ function sbo_get_field_schema(): array
 				'social-youtube'         => ['label' => 'YouTube URL',          'type' => 'url'],
 				'social-twitter-x'       => ['label' => 'Twitter / X URL',      'type' => 'url'],
 				'social-google-business' => ['label' => 'Google Business URL',  'type' => 'url'],
+				'social-pinterest'       => ['label' => 'Pinterest URL',        'type' => 'url'],
+				'social-bing'            => ['label' => 'Bing URL',             'type' => 'url'],
+				'social-tiktok'          => ['label' => 'TikTok URL',           'type' => 'url'],
+				'social-snapchat'        => ['label' => 'Snapchat URL',         'type' => 'url'],
+				'social-reddit'          => ['label' => 'Reddit URL',           'type' => 'url'],
+				'social-wordpress'       => ['label' => 'WordPress URL',        'type' => 'url'],
+				'social-whatsapp'        => ['label' => 'WhatsApp URL',         'type' => 'url'],
 				'social-yelp'            => ['label' => 'Yelp URL',             'type' => 'url'],
+				'social-tripadvisor'     => ['label' => 'TripAdvisor URL',      'type' => 'url'],
 				'social-github'          => ['label' => 'GitHub URL',           'type' => 'url'],
+				'social-bbb'             => ['label' => 'BBB URL',              'type' => 'url'],
 			]
 		],
 	];

@@ -6,8 +6,6 @@ This file provides guidance to Codex (Codex.ai/code) when working with code in t
 
 **wp-sitebuilderone-lite** stores local business data (branding, contact info, social media, address, schema, integrations) in a single WordPress option key (`sbo_options`) and exposes it via shortcodes and a PHP helper. Zero external dependencies.
 
-Dev site runs at `http://localhost:10018` (Local by Flywheel).
-
 ## No Build Step
 
 There is no build process, no `package.json`, no `composer.json`. PHP files are edited directly. The plugin loads via the `plugins_loaded` hook in `wp-sitebuilderone-lite.php`.
