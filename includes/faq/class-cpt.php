@@ -23,7 +23,7 @@ class SBO_FAQ_CPT {
 			'public'       => true,
 			'has_archive'  => false,
 			'rewrite'      => [ 'slug' => SBO_FAQ_Admin_Settings::get_faq_slug() ],
-			'supports'     => [ 'title', 'editor', 'page-attributes' ],
+			'supports'     => [ 'title', 'editor', 'thumbnail', 'page-attributes' ],
 			'taxonomies'   => [ 'post_tag' ],
 			'menu_icon'    => 'dashicons-editor-help',
 			'show_in_menu' => 'sitebuilderone',

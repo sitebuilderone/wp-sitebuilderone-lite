@@ -3,7 +3,7 @@
  * Plugin Name:  WP SiteBuilderOne Lite
  * Plugin URI:   https://github.com/sitebuilderone/wp-sitebuilderone-lite
  * Description:  Stores local business data in wp_options. No dependencies required. Additional custom post types included for services and FAQs. Designed for maximum compatibility with page builders and themes. Ideal for agencies building sites for local businesses.
- * Version:      1.0.5
+ * Version:      1.0.6
  * Author:       SiteBuilderOne
  * Author URI:   https://www.sitebuilderone.com
  * License:      GPL-2.0-or-later
@@ -13,7 +13,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'SBO_VERSION',    '1.0.5' );
+define( 'SBO_VERSION',    '1.0.6' );
 define( 'SBO_DIR',        plugin_dir_path( __FILE__ ) );
 define( 'SBO_URL',        plugin_dir_url( __FILE__ ) );
 define( 'SBO_OPTION_KEY', 'sbo_options' );

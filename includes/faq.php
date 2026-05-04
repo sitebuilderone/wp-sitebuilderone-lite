@@ -2,6 +2,7 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 require_once SBO_DIR . 'includes/faq/class-admin-settings.php';
+require_once SBO_DIR . 'includes/faq/class-admin-columns.php';
 require_once SBO_DIR . 'includes/faq/class-cpt.php';
 require_once SBO_DIR . 'includes/faq/class-howto-cpt.php';
 require_once SBO_DIR . 'includes/faq/class-meta-boxes.php';
@@ -23,12 +24,19 @@ add_action( 'init', [ 'SBO_FAQ_Shortcode', 'register' ] );
 add_action( 'init', [ 'SBO_FAQ_HowTo_Shortcode', 'register' ] );
 add_action( 'init', [ 'SBO_FAQ_Schema', 'register' ] );
 add_action( 'init', [ 'SBO_FAQ_HowTo_Schema', 'register' ] );
+add_filter( 'manage_faq_posts_columns', [ 'SBO_FAQ_Admin_Columns', 'add_columns' ] );
+add_filter( 'manage_howto_posts_columns', [ 'SBO_FAQ_Admin_Columns', 'add_columns' ] );
+add_action( 'manage_faq_posts_custom_column', [ 'SBO_FAQ_Admin_Columns', 'render_column' ], 10, 2 );
+add_action( 'manage_howto_posts_custom_column', [ 'SBO_FAQ_Admin_Columns', 'render_column' ], 10, 2 );
+add_filter( 'manage_edit-faq_sortable_columns', [ 'SBO_FAQ_Admin_Columns', 'sortable_columns' ] );
+add_filter( 'manage_edit-howto_sortable_columns', [ 'SBO_FAQ_Admin_Columns', 'sortable_columns' ] );
 add_action( 'add_meta_boxes', [ 'SBO_FAQ_Meta_Boxes', 'add' ] );
 add_action( 'add_meta_boxes', [ 'SBO_FAQ_HowTo_Meta_Boxes', 'add' ] );
 add_action( 'save_post_faq', [ 'SBO_FAQ_Meta_Boxes', 'save' ] );
 add_action( 'save_post_howto', [ 'SBO_FAQ_HowTo_Meta_Boxes', 'save' ] );
 add_action( 'admin_enqueue_scripts', [ 'SBO_FAQ_Meta_Boxes', 'enqueue_styles' ] );
 add_action( 'admin_enqueue_scripts', [ 'SBO_FAQ_HowTo_Meta_Boxes', 'enqueue_styles' ] );
+add_action( 'admin_enqueue_scripts', [ 'SBO_FAQ_Admin_Columns', 'enqueue_styles' ] );
 
 add_action( 'init', 'sbo_faq_maybe_flush_rewrites', 20 );
 function sbo_faq_maybe_flush_rewrites() {

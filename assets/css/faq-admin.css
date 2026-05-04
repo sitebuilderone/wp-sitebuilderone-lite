@@ -42,3 +42,32 @@
 #sbo-howto-meta .sbo-howto-step h4 {
 	margin: 0 0 12px;
 }
+
+.wp-list-table .column-sbo_featured_image {
+	width: 74px;
+}
+
+.sbo-faq-list-image {
+	display: block;
+	width: 48px;
+	height: 48px;
+	object-fit: cover;
+	border-radius: 4px;
+	background: #f0f0f1;
+}
+
+.sbo-faq-list-image-placeholder {
+	display: inline-block;
+	width: 48px;
+	text-align: center;
+	color: #8c8f94;
+}
+
+.wp-list-table .column-sbo_post_tags {
+	width: 18%;
+}
+
+.wp-list-table .column-sbo_menu_order {
+	width: 74px;
+	text-align: center;
+}

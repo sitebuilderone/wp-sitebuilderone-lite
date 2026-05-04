@@ -23,7 +23,7 @@ class SBO_Services_CPT {
 			'public'       => true,
 			'has_archive'  => false,
 			'rewrite'      => [ 'slug' => 'services' ],
-			'supports'     => [ 'title', 'editor', 'thumbnail', 'excerpt' ],
+			'supports'     => [ 'title', 'editor', 'thumbnail', 'excerpt', 'page-attributes' ],
 			'menu_icon'    => 'dashicons-hammer',
 			'show_in_menu' => 'sitebuilderone',
 			'show_in_rest' => true,
