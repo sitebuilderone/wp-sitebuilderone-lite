@@ -1,0 +1,44 @@
+#sbo-faq-meta,
+#sbo-howto-meta {
+	padding: 4px 0;
+}
+
+#sbo-faq-meta .sbo-faq-meta-field,
+#sbo-howto-meta .sbo-faq-meta-field {
+	margin-bottom: 16px;
+}
+
+#sbo-faq-meta .sbo-faq-meta-field label,
+#sbo-howto-meta .sbo-faq-meta-field label {
+	display: block;
+	font-weight: 600;
+	margin-bottom: 4px;
+}
+
+#sbo-faq-meta .sbo-faq-meta-field textarea,
+#sbo-faq-meta .sbo-faq-meta-field select,
+#sbo-howto-meta .sbo-faq-meta-field textarea,
+#sbo-howto-meta .sbo-faq-meta-field select,
+#sbo-howto-meta .sbo-faq-meta-field input[type="text"],
+#sbo-howto-meta .sbo-faq-meta-field input[type="url"] {
+	width: 100%;
+	max-width: 600px;
+}
+
+#sbo-faq-meta .sbo-faq-meta-field .description,
+#sbo-howto-meta .sbo-faq-meta-field .description {
+	margin-top: 4px;
+	color: #757575;
+	font-style: italic;
+}
+
+#sbo-howto-meta .sbo-howto-step {
+	border: 1px solid #dcdcde;
+	margin: 12px 0;
+	max-width: 620px;
+	padding: 12px;
+}
+
+#sbo-howto-meta .sbo-howto-step h4 {
+	margin: 0 0 12px;
+}

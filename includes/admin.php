@@ -167,7 +167,7 @@ add_action('admin_menu', function () {
 		'sitebuilderone',                // Menu Slug
 		'sbo_render_admin_page',         // Callback for the "General" view
 		'dashicons-admin-site-alt3',     // Icon
-		80                               // Position
+		3                                // Position - directly below Dashboard
 	);
 	// 2. Add Submenu Items (Optional: break your schema into these)
 	add_submenu_page(

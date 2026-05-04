@@ -2,8 +2,8 @@
 /**
  * Plugin Name:  WP SiteBuilderOne Lite
  * Plugin URI:   https://github.com/sitebuilderone/wp-sitebuilderone-lite
- * Description:  Stores local business data in wp_options. No dependencies required. Additional custom post types included for services and FAQs. Optional recommended plugins for enhanced functionality.
- * Version:      1.0.4
+ * Description:  Stores local business data in wp_options. No dependencies required. Additional custom post types included for services and FAQs. Designed for maximum compatibility with page builders and themes. Ideal for agencies building sites for local businesses.
+ * Version:      1.0.5
  * Author:       SiteBuilderOne
  * Author URI:   https://www.sitebuilderone.com
  * License:      GPL-2.0-or-later
@@ -13,7 +13,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'SBO_VERSION',    '1.0.4' );
+define( 'SBO_VERSION',    '1.0.5' );
 define( 'SBO_DIR',        plugin_dir_path( __FILE__ ) );
 define( 'SBO_URL',        plugin_dir_url( __FILE__ ) );
 define( 'SBO_OPTION_KEY', 'sbo_options' );
@@ -21,11 +21,17 @@ define( 'SBO_OPTION_KEY', 'sbo_options' );
 function sbo_activate() {
 	require_once SBO_DIR . 'includes/services/class-cpt.php';
 	require_once SBO_DIR . 'includes/services/class-taxonomy.php';
+	require_once SBO_DIR . 'includes/faq/class-admin-settings.php';
+	require_once SBO_DIR . 'includes/faq/class-cpt.php';
+	require_once SBO_DIR . 'includes/faq/class-howto-cpt.php';
 
 	SBO_Services_CPT::register();
 	SBO_Services_Taxonomy::register();
+	SBO_FAQ_CPT::register();
+	SBO_FAQ_HowTo_CPT::register();
 	flush_rewrite_rules();
 	update_option( 'sbo_services_rewrite_version', SBO_VERSION, false );
+	update_option( 'sbo_faq_rewrite_version', SBO_VERSION, false );
 }
 register_activation_hook( __FILE__, 'sbo_activate' );
 
@@ -38,6 +44,7 @@ add_action( 'plugins_loaded', function () {
     require_once SBO_DIR . 'includes/pages.php';
     require_once SBO_DIR . 'includes/schema-org.php';
     require_once SBO_DIR . 'includes/services.php';
+    require_once SBO_DIR . 'includes/faq.php';
     require_once SBO_DIR . 'includes/setup-guide.php';
 } 
 );
@@ -72,11 +79,12 @@ add_action('init', 'sbo_enable_tags_for_pages');
 function sbo_enable_tags_for_pages() {
     register_taxonomy_for_object_type('post_tag', 'page');
     register_taxonomy_for_object_type('post_tag', 'faq');
+    register_taxonomy_for_object_type('post_tag', 'howto');
 }
 
 // Optional: Ensure tags are included in search results for pages
 add_action('pre_get_posts', function($query) {
     if ($query->is_tag() && $query->is_main_query()) {
-        $query->set('post_type', ['post', 'page', 'faq']);
+        $query->set('post_type', ['post', 'page', 'faq', 'howto']);
     }
 });
