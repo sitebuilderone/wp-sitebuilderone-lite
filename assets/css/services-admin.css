@@ -1,0 +1,26 @@
+#sbo-services-meta {
+	padding: 4px 0;
+}
+
+#sbo-services-meta .sbo-service-meta-field {
+	margin-bottom: 16px;
+}
+
+#sbo-services-meta .sbo-service-meta-field label {
+	display: block;
+	font-weight: 600;
+	margin-bottom: 4px;
+}
+
+#sbo-services-meta .sbo-service-meta-field input[type="text"],
+#sbo-services-meta .sbo-service-meta-field input[type="url"],
+#sbo-services-meta .sbo-service-meta-field textarea {
+	width: 100%;
+	max-width: 600px;
+}
+
+#sbo-services-meta .sbo-service-meta-field .description {
+	margin-top: 4px;
+	color: #757575;
+	font-style: italic;
+}

@@ -90,7 +90,6 @@ add_action( 'admin_notices', function () {
         <p>Custom SiteBuilderOne plugins:</p>
         <ul style="list-style:disc;margin-left:1.5em;">
             <li><a href="https://github.com/sitebuilderone/wp-sb1-faq" target="_blank">FAQ</a></li>
-            <li><a href="https://github.com/sitebuilderone/wp-sb1-services" target="_blank">Services</a></li>   
         </ul>
     </div>
     <?php

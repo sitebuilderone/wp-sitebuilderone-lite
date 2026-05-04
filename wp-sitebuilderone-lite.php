@@ -2,8 +2,8 @@
 /**
  * Plugin Name:  WP SiteBuilderOne Lite
  * Plugin URI:   https://github.com/sitebuilderone/wp-sitebuilderone-lite
- * Description:  Stores local business data in wp_options. No dependencies required.
- * Version:      1.0.3
+ * Description:  Stores local business data in wp_options. No dependencies required. Additional custom post types included for services and FAQs. Optional recommended plugins for enhanced functionality.
+ * Version:      1.0.4
  * Author:       SiteBuilderOne
  * Author URI:   https://www.sitebuilderone.com
  * License:      GPL-2.0-or-later
@@ -13,10 +13,21 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'SBO_VERSION',    '1.0.0' );
+define( 'SBO_VERSION',    '1.0.4' );
 define( 'SBO_DIR',        plugin_dir_path( __FILE__ ) );
 define( 'SBO_URL',        plugin_dir_url( __FILE__ ) );
 define( 'SBO_OPTION_KEY', 'sbo_options' );
+
+function sbo_activate() {
+	require_once SBO_DIR . 'includes/services/class-cpt.php';
+	require_once SBO_DIR . 'includes/services/class-taxonomy.php';
+
+	SBO_Services_CPT::register();
+	SBO_Services_Taxonomy::register();
+	flush_rewrite_rules();
+	update_option( 'sbo_services_rewrite_version', SBO_VERSION, false );
+}
+register_activation_hook( __FILE__, 'sbo_activate' );
 
 add_action( 'plugins_loaded', function () {
 	require_once SBO_DIR . 'includes/admin.php';
@@ -26,6 +37,7 @@ add_action( 'plugins_loaded', function () {
     require_once SBO_DIR . 'includes/plugins.php';
     require_once SBO_DIR . 'includes/pages.php';
     require_once SBO_DIR . 'includes/schema-org.php';
+    require_once SBO_DIR . 'includes/services.php';
     require_once SBO_DIR . 'includes/setup-guide.php';
 } 
 );

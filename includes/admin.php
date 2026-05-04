@@ -62,6 +62,9 @@ function sbo_get_field_schema(): array
 				'one_headline_support' => ['label' => 'Headline Support Copy', 'type' => 'textarea'],
 				'one_marketing_image'  => ['label' => 'Marketing Image URL',   'type' => 'media'],
 				'one_cta_text'         => ['label' => 'CTA text',              'type' => 'text'],
+				'one_cta_url'         => ['label' => 'CTA URL',              'type' => 'page'],
+				'one_cta_text_02'         => ['label' => 'CTA text (02)',              'type' => 'text'],
+				'one_cta_url_02'         => ['label' => 'CTA URL (02)',              'type' => 'page'],
 			]
 		],
 		'Key Web Pages' => [
