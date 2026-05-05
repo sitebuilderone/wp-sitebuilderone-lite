@@ -43,6 +43,54 @@
 	margin-top: 4px !important;
 }
 
+.sbo-client-brief-questions {
+	margin: 0 0 1.5em;
+	max-width: 760px;
+	background: #f6f7f7;
+	border: 1px solid #dcdcde;
+	border-radius: 3px;
+	padding: 0.75em 1em;
+}
+
+.sbo-client-brief-questions h3 {
+	font-weight: 600;
+	margin: 0 0 0.5em;
+	font-size: 1em;
+}
+
+.sbo-client-brief-questions ul {
+	margin-bottom: 0;
+	padding-left: 1.5em;
+}
+
+.sbo-client-brief-prefill-table {
+	margin-top: 1em;
+}
+
+.sbo-client-brief-prefill-table td {
+	vertical-align: top;
+}
+
+.sbo-prefill-status {
+	display: inline-block;
+	padding: 2px 7px;
+	border-radius: 3px;
+	background: #f0f0f1;
+	color: #3c434a;
+	font-size: 12px;
+	font-weight: 600;
+}
+
+.sbo-prefill-status-missing {
+	background: #fcf9e8;
+	color: #7a5d00;
+}
+
+.sbo-prefill-status-filled {
+	background: #edfaef;
+	color: #1a6b2a;
+}
+
 /* Shortcode reference */
 .sbo-shortcode-ref {
 	margin-top: 8px !important;

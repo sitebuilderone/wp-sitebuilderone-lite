@@ -4,9 +4,22 @@ Lightweight WordPress plugin for local business websites. Stores business data (
 
 **Lite version of:** https://github.com/sitebuilderone/wp-sitebuilderone
 
+## Client Brief Workflow
+
+This repo separates implementation instructions from client-specific strategy:
+
+- `AGENTS.md` contains repo, architecture, testing, and coding guidance.
+- `CLIENT.md` points to the active client brief for the current site.
+- `client-briefs/_template.md` is the reusable onboarding questionnaire.
+- For a new client, copy `client-briefs/_template.md` to `client-briefs/client-name.md`, fill it in, then update `CLIENT.md` so future content, SEO, service, FAQ, and page work uses the right business context.
+- In WordPress, **SiteBuilderOne > Client Brief** stores the same kind of client-specific onboarding context in the separate `sbo_client_brief` option, so it does not collide with live site settings in `sbo_options`.
+- The Client Brief screen can import/export Markdown files that use the template's section headings and field labels, making it possible to move notes between files, client calls, AI drafts, and WordPress.
+- The Client Brief screen can also fill missing live site fields from mapped brief values while preserving existing `sbo_options` values.
+
 ## Features
 
 - ✅ **Admin Settings Page** — Single-page UI under Settings > SiteBuilderOne
+- ✅ **Client Brief Admin Page** — Stores onboarding, SEO, content, and strategy notes under `sbo_client_brief`
 - ✅ **Shortcode Support** — `[sbo_field name="one_business_name"]` for templates
 - ✅ **PHP Helper** — `sbo_get('field_key')` for direct use in code
 - ✅ **CSV Import/Export** — Bulk data management
@@ -26,7 +39,7 @@ Lightweight WordPress plugin for local business websites. Stores business data (
 4. Use shortcodes in pages/posts: `[sbo_field name="one_business_name"]`
 5. Or use PHP in templates: `echo sbo_get('one_business_name');`
 
-**For detailed development instructions, see [`.claude/instructions.md`](.claude/instructions.md).**
+**For detailed development instructions, see [`AGENTS.md`](AGENTS.md).**
 
 ## Field Organization
 
