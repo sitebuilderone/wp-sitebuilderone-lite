@@ -55,6 +55,21 @@ add_action( 'admin_notices', function () {
     'check' => 'advanced-google-recaptcha/advanced-google-recaptcha.php',
 ],
 [
+    'name'  => 'Phoenix Media Rename',
+    'slug'  => 'phoenix-media-rename/',
+    'check' => 'phoenix-media-rename/phoenix-media-rename.php',
+],
+[
+    'name'  => 'Microsoft Clarity',
+    'slug'  => 'microsoft-clarity/',
+    'check' => 'microsoft-clarity/microsoft-clarity.php',
+],
+[
+    'name'  => 'Fluent Forms',
+    'slug'  => 'fluentform',
+    'check' => 'fluentform/fluentform.php',
+],
+[
     'name'  => '[Local dev] GitHub Deployer',
     'slug'  => 'deployer-for-git',
     'check' => 'deployer-for-git/deployer-for-git.php',

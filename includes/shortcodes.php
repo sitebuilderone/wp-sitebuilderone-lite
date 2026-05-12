@@ -142,6 +142,62 @@ add_shortcode( 'sbo_url', function ( $atts ) {
     return esc_url_raw( $url );
 } );
 
+/**
+ * [sbo_image_url name="field_key"]
+ * Returns an escaped image/media URL from a saved SiteBuilderOne field.
+ *
+ * Example:
+ *   [sbo_image_url name="one_marketing_image"]
+ */
+add_shortcode( 'sbo_image_url', function ( $atts ) {
+    $atts = shortcode_atts(
+        [
+            'name'    => 'one_marketing_image',
+            'default' => '',
+        ],
+        $atts,
+        'sbo_image_url'
+    );
+
+    $url = sbo_get( $atts['name'], $atts['default'] );
+
+    return $url ? esc_url( $url ) : '';
+} );
+
+/**
+ * [sbo_background_image_style name="field_key"]
+ * Returns CSS declarations for a background image so builders do not need
+ * to parse a shortcode nested inside url('...').
+ *
+ * Example:
+ *   style='[sbo_background_image_style name="one_marketing_image"]'
+ */
+add_shortcode( 'sbo_background_image_style', function ( $atts ) {
+    $atts = shortcode_atts(
+        [
+            'name'     => 'one_marketing_image',
+            'overlay'  => '0.55',
+            'position' => 'center',
+            'size'     => 'cover',
+        ],
+        $atts,
+        'sbo_background_image_style'
+    );
+
+    $url = sbo_get( $atts['name'] );
+    if ( ! $url ) return '';
+
+    $overlay = max( 0, min( 1, (float) $atts['overlay'] ) );
+
+    return sprintf(
+        'background-image: linear-gradient(rgba(0,0,0,%1$s), rgba(0,0,0,%1$s)), url(%2$s); background-size: %3$s; background-position: %4$s;',
+        esc_attr( $overlay ),
+        esc_url( $url ),
+        esc_attr( $atts['size'] ),
+        esc_attr( $atts['position'] )
+    );
+} );
+
 
 /**
  * [sbo_header_cta_url]
