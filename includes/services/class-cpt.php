@@ -25,7 +25,8 @@ class SBO_Services_CPT {
 			'rewrite'      => [ 'slug' => 'services' ],
 			'supports'     => [ 'title', 'editor', 'thumbnail', 'excerpt', 'page-attributes' ],
 			'menu_icon'    => 'dashicons-hammer',
-			'show_in_menu' => 'sitebuilderone',
+			'show_in_menu' => true,
+			'menu_position'=> 4,
 			'show_in_rest' => true,
 			'rest_base'    => 'services',
 		];

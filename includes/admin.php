@@ -390,8 +390,8 @@ function sbo_render_admin_page()
 									<?php if ($val !== '') : ?>
 										<p class="description sbo-shortcode-ref" style="margin-top:8px;">
 											<strong>Shortcode:</strong>
-											<code class="sbo-shortcode-code">[sbo_field name="<?php echo esc_attr($key); ?>"<?php echo $is_raw ? ' raw="true"' : ''; ?>]</code>
-											<button type="button" class="button button-small sbo-copy-shortcode" data-shortcode='[sbo_field name="<?php echo esc_attr($key); ?>"<?php echo $is_raw ? ' raw="true"' : ''; ?>]'>Copy</button>
+											<tangible class="live-reload">[sbo_field name="<?php echo esc_attr($key); ?>"<?php echo $is_raw ? ' raw="true"' : ''; ?>]</tangible>
+											<button type="button" class="button button-small sbo-copy-shortcode" data-shortcode='<tangible class="live-reload">[sbo_field name="<?php echo esc_attr($key); ?>"<?php echo $is_raw ? ' raw="true"' : ''; ?>]</tangible>'>Copy</button>
 										</p>
 									<?php endif; ?>
 								</td>

@@ -26,7 +26,8 @@ class SBO_FAQ_HowTo_CPT {
 			'supports'     => [ 'title', 'editor', 'thumbnail', 'excerpt', 'page-attributes' ],
 			'taxonomies'   => [ 'post_tag' ],
 			'menu_icon'    => 'dashicons-list-view',
-			'show_in_menu' => 'sitebuilderone',
+			'show_in_menu' => true,
+			'menu_position'=> 4,
 			'show_in_rest' => true,
 			'rest_base'    => 'howtos',
 		];
