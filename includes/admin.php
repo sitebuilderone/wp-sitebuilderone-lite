@@ -102,6 +102,10 @@ function sbo_get_field_schema(): array
 				'one_longitude'        => ['label' => 'Longitude',             'type' => 'text'],
 				'one_google_map_url'   => ['label' => 'Google Map URL',        'type' => 'url'],
 				'one_google_map_embed' => ['label' => 'Google Map Embed Code', 'type' => 'textarea', 'raw' => true],
+				'one_business_hours_header_html'        => ['label' => 'Business hours (Mon–Fri 10:00am–5:30pm)', 'type' => 'text'],
+				
+				'one_business_hours_footer_html' => ['label' => 'Business hours - footer HTML', 'type' => 'textarea', 'raw' => true],
+
 			]
 		],
 		'Integrations' => [
