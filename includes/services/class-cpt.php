@@ -13,6 +13,7 @@ class SBO_Services_CPT {
 			'new_item'           => __( 'New Service', 'wp-sitebuilderone-lite' ),
 			'view_item'          => __( 'View Service', 'wp-sitebuilderone-lite' ),
 			'search_items'       => __( 'Search Services', 'wp-sitebuilderone-lite' ),
+			'parent_item_colon'  => __( 'Parent Service:', 'wp-sitebuilderone-lite' ),
 			'not_found'          => __( 'No services found', 'wp-sitebuilderone-lite' ),
 			'not_found_in_trash' => __( 'No services found in trash', 'wp-sitebuilderone-lite' ),
 			'menu_name'          => __( 'Services', 'wp-sitebuilderone-lite' ),
@@ -21,8 +22,9 @@ class SBO_Services_CPT {
 		$args = [
 			'labels'       => $labels,
 			'public'       => true,
+			'hierarchical' => true,
 			'has_archive'  => false,
-			'rewrite'      => [ 'slug' => 'services' ],
+			'rewrite'      => [ 'slug' => 'services', 'hierarchical' => true ],
 			'supports'     => [ 'title', 'editor', 'thumbnail', 'excerpt', 'page-attributes' ],
 			'menu_icon'    => 'dashicons-hammer',
 			'show_in_menu' => true,
