@@ -13,7 +13,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'SBO_VERSION',    '1.0.82' );
+define( 'SBO_VERSION',    '1.0.83' );
 define( 'SBO_DIR',        plugin_dir_path( __FILE__ ) );
 define( 'SBO_URL',        plugin_dir_url( __FILE__ ) );
 define( 'SBO_OPTION_KEY', 'sbo_options' );

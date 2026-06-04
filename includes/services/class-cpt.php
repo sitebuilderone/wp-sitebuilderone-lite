@@ -24,7 +24,7 @@ class SBO_Services_CPT {
 			'public'       => true,
 			'hierarchical' => true,
 			'has_archive'  => false,
-			'rewrite'      => [ 'slug' => 'services', 'hierarchical' => true ],
+			'rewrite'      => [ 'slug' => 'services', 'with_front' => false, 'hierarchical' => true ],
 			'supports'     => [ 'title', 'editor', 'thumbnail', 'excerpt', 'page-attributes' ],
 			'menu_icon'    => 'dashicons-hammer',
 			'show_in_menu' => true,
