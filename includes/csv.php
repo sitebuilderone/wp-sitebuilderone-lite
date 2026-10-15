@@ -21,11 +21,11 @@ add_action( 'admin_post_sbo_export_csv', function () {
 	// UTF-8 BOM so Excel opens the file correctly.
 	fwrite( $out, "\xEF\xBB\xBF" );
 
-	fputcsv( $out, [ 'Section', 'Field', 'Value' ] );
+	fputcsv( $out, [ 'Section', 'Field', 'Value' ], ',', '"', '' );
 
-	foreach ( $schema as $section => $fields ) {
-		foreach ( $fields as $key => $meta ) {
-			fputcsv( $out, [ $section, $key, $options[ $key ] ?? '' ] );
+	foreach ( $schema as $section => $definition ) {
+		foreach ( $definition['fields'] ?? [] as $key => $meta ) {
+			fputcsv( $out, [ $section, $key, $options[ $key ] ?? '' ], ',', '"', '' );
 		}
 	}
 
@@ -40,7 +40,7 @@ add_action( 'admin_post_sbo_import_csv', function () {
 	if ( ! current_user_can( 'manage_options' ) ) wp_die( 'Unauthorized' );
 	check_admin_referer( 'sbo_import_csv', 'sbo_import_nonce' );
 
-	$redirect_base = add_query_arg( 'page', 'wp-sitebuilderone-lite', admin_url( 'options-general.php' ) );
+	$redirect_base = add_query_arg( 'page', 'sitebuilderone', admin_url( 'admin.php' ) );
 
 	if ( empty( $_FILES['sbo_csv_file']['tmp_name'] ) ) {
 		wp_safe_redirect( add_query_arg( 'sbo_error', 'no_file', $redirect_base ) );
@@ -58,8 +58,8 @@ add_action( 'admin_post_sbo_import_csv', function () {
 	// Build a flat lookup of allowed field keys → meta.
 	$schema     = sbo_get_field_schema();
 	$flat       = [];
-	foreach ( $schema as $fields ) {
-		foreach ( $fields as $key => $meta ) {
+	foreach ( $schema as $definition ) {
+		foreach ( $definition['fields'] ?? [] as $key => $meta ) {
 			$flat[ $key ] = $meta;
 		}
 	}
@@ -68,7 +68,7 @@ add_action( 'admin_post_sbo_import_csv', function () {
 	$row_num  = 0;
 	$imported = 0;
 
-	while ( ( $row = fgetcsv( $handle ) ) !== false ) {
+	while ( ( $row = fgetcsv( $handle, 0, ',', '"', '' ) ) !== false ) {
 		$row_num++;
 
 		// Skip header row.
@@ -84,7 +84,17 @@ add_action( 'admin_post_sbo_import_csv', function () {
 		if ( ! isset( $flat[ $field ] ) ) continue;
 
 		$meta             = $flat[ $field ];
-		$current[ $field ] = sbo_sanitize_field( (string) $value, $meta['type'], ! empty( $meta['raw'] ) );
+		if ( ! empty( $meta['raw'] ) ) {
+			$current[ $field ] = wp_kses_post( $value );
+		} else {
+			$current[ $field ] = match ( $meta['type'] ) {
+				'url', 'media', 'page' => esc_url_raw( $value ),
+				'email'               => sanitize_email( $value ),
+				'textarea'            => sanitize_textarea_field( $value ),
+				'checkbox'            => $value ? '1' : '0',
+				default               => sanitize_text_field( $value ),
+			};
+		}
 		$imported++;
 	}
 

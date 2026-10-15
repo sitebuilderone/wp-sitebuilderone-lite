@@ -737,6 +737,7 @@ function sbo_render_client_brief_page() {
 	?>
 	<div class="wrap sbo-wrap">
 		<h1>Client Brief</h1>
+		<?php sbo_render_settings_export_controls(); ?>
 		<p class="description">Store client-specific strategy, SEO, content, and onboarding notes separately from live site settings. This data is saved in the <code><?php echo esc_html( SBO_CLIENT_BRIEF_OPTION_KEY ); ?></code> option.</p>
 
 		<?php if ( isset( $_GET['updated'] ) ) : ?>

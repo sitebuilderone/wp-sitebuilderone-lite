@@ -327,6 +327,7 @@ function sbo_render_admin_page()
 ?>
 	<div class="wrap sbo-wrap">
 		<h1>SiteBuilderOne Settings</h1>
+		<?php sbo_render_settings_export_controls(); ?>
 		<?php if (isset($_GET['updated'])) : ?>
 			<div class="notice notice-success is-dismissible">
 				<p>Settings saved.</p>

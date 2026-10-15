@@ -1,8 +1,29 @@
-# wp-sitebuilderone-lite 1.0.85
+# wp-sitebuilderone-lite 1.0.86
 
 Lightweight WordPress plugin for local business websites. Stores business data (branding, contact info, social media, integrations) in `wp_options` with zero external dependencies. Supports CSV import/export, full Google Local Business schema compliance, and three custom post types for Services, FAQs, and HowTos.
 
 **Lite version of:** https://github.com/sitebuilderone/wp-sitebuilderone
+
+## Importing and Exporting All Plugin Settings
+
+Use **Export All Settings (Markdown)** or **Export All Settings (JSON)** on any SiteBuilderOne settings screen or Client Brief. Save edits before exporting. Both downloads include all existing plugin-owned option records, preserving their separate values and any legacy fields:
+
+| Option record | Contents |
+| --- | --- |
+| `sbo_options` | 69 live fields across Branding, Header, Global Footer, Sticky Footer, Hero Marketing, Key Web Pages, Business Information, Physical Address, Integrations, and Social Media |
+| `sbo_client_brief` | Onboarding, content strategy, SEO, and client notes |
+| `sb1_faq_slug`, `sb1_howto_slug` | Saved FAQ and HowTo URL bases |
+| `sbo_services_rewrite_version`, `sbo_faq_rewrite_version` | Internal rewrite versions |
+
+General Settings, Business Info, Marketing, Design, Pages, and Social Media are views into the same `sbo_options` record. Client Brief overlaps with 27 live fields through `sbo_get_client_brief_option_map()`, but stores its own values. Header/footer design, page selections, several social profiles, and integrations are among the live settings omitted by the brief-only format.
+
+**Export Markdown** in the Client Brief box exports only the brief schema, using mapped live values for empty brief fields. **Export All Settings** includes every stored value in the six option records, without merging or sanitizing them. JSON retains the data structure; Markdown shows each record as formatted JSON. Neither full export format is accepted by the Client Brief importer. Use **Import All Settings & Client Brief** with the full JSON export to transfer both in one upload. The destination must have this version of the plugin (or another version supporting format version 1).
+
+Import requires `manage_options`, a valid nonce, and an uploaded JSON file up to 5 MB. The entire file is validated before writing. Files containing option names outside the six-record allowlist are rejected. Field sanitization follows the live settings/brief schemas; legacy live fields retain array/scalar structure with text sanitization. Matching fields are overwritten (including blank values), while omitted fields and sections remain unchanged. Internal rewrite versions are not copied from the source; destination slug hooks regenerate permalink rules and maintain the destination version. Database write failures are reported and may require retrying a partially completed import.
+
+Page links, image URLs, and other URLs retain their source addresses. Review them after migration. Settings import does not create pages or transfer Services, FAQs, HowTos, post meta, taxonomies, or media files. Full Markdown exports are reference documents; only full JSON exports work with the combined importer.
+
+Exports omit records that have never been saved. They exclude unrelated WordPress/plugin options and content stored in posts, post meta, taxonomies, or media files. Downloads require an administrator capability and a valid nonce; exporting does not change saved options.
 
 ## Client Brief Workflow
 
