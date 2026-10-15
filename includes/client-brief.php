@@ -383,6 +383,32 @@ function sbo_sanitize_client_brief_data( array $posted ): array {
 	return $data;
 }
 
+/**
+ * Build an export using saved site values where the brief has no value.
+ * This does not save site values into the Client Brief option.
+ */
+function sbo_get_client_brief_export_data(): array {
+	$brief   = sbo_get_client_brief();
+	$options = get_option( SBO_OPTION_KEY, [] );
+	$options = is_array( $options ) ? $options : [];
+
+	foreach ( sbo_get_client_brief_option_map() as $brief_path => $option_key ) {
+		[ $section, $field ] = explode( '.', $brief_path, 2 );
+		$brief_value = $brief[ $section ][ $field ] ?? '';
+		$site_value  = $options[ $option_key ] ?? '';
+
+		if ( is_scalar( $brief_value ) && '' !== trim( (string) $brief_value ) ) {
+			continue;
+		}
+
+		if ( is_scalar( $site_value ) && '' !== trim( (string) $site_value ) ) {
+			$brief[ $section ][ $field ] = (string) $site_value;
+		}
+	}
+
+	return sbo_sanitize_client_brief_data( $brief );
+}
+
 function sbo_client_brief_to_markdown( array $brief ): string {
 	$schema = sbo_get_client_brief_schema();
 	$lines  = [
@@ -466,7 +492,7 @@ function sbo_client_brief_from_markdown( string $markdown ): array {
 			continue;
 		}
 
-		if ( preg_match( '/^\s*-\s+([^:]+):\s*(.*)$/', $line, $matches ) ) {
+		if ( preg_match( '/^-\s+([^:]+):\s*(.*)$/', $line, $matches ) ) {
 			$normalized_field = sbo_client_brief_normalize_label( $matches[1] );
 			$current_field    = $field_lookup[ $current_section ][ $normalized_field ] ?? '';
 
@@ -625,7 +651,7 @@ add_action( 'admin_post_sbo_export_client_brief_md', function () {
 
 	check_admin_referer( 'sbo_export_client_brief_md' );
 
-	$brief    = sbo_get_client_brief();
+	$brief    = sbo_get_client_brief_export_data();
 	$markdown = sbo_client_brief_to_markdown( $brief );
 
 	header( 'Content-Type: text/markdown; charset=UTF-8' );
@@ -667,7 +693,26 @@ add_action( 'admin_post_sbo_import_client_brief_md', function () {
 	}
 
 	$data = sbo_client_brief_from_markdown( $contents );
-	update_option( SBO_CLIENT_BRIEF_OPTION_KEY, $data, false );
+	$brief = sbo_get_client_brief();
+	$count = 0;
+
+	// Import populated fields only; blank templates must never erase saved notes.
+	foreach ( $data as $section_key => $fields ) {
+		foreach ( $fields as $field_key => $value ) {
+			if ( '' === trim( $value ) ) {
+				continue;
+			}
+			$brief[ $section_key ][ $field_key ] = $value;
+			$count++;
+		}
+	}
+
+	if ( 0 === $count ) {
+		wp_safe_redirect( add_query_arg( 'sbo_error', 'no_values', $redirect ) );
+		exit;
+	}
+
+	update_option( SBO_CLIENT_BRIEF_OPTION_KEY, $brief, false );
 
 	wp_safe_redirect( add_query_arg( [ 'imported' => '1' ], $redirect ) );
 	exit;
@@ -708,7 +753,11 @@ function sbo_render_client_brief_page() {
 
 		<?php if ( isset( $_GET['sbo_error'] ) ) : ?>
 			<div class="notice notice-error is-dismissible">
-				<p>Client brief import failed. Please upload a readable Markdown file.</p>
+				<?php if ( 'no_values' === ( $_GET['sbo_error'] ?? '' ) ) : ?>
+					<p>No populated Client Brief fields were found. Add values after the template labels (for example, <code>- Business name: Acme Corp</code>) and import again. Existing brief values were preserved.</p>
+				<?php else : ?>
+					<p>Client brief import failed. Please upload a readable Markdown file.</p>
+				<?php endif; ?>
 			</div>
 		<?php endif; ?>
 
@@ -720,7 +769,7 @@ function sbo_render_client_brief_page() {
 
 		<div class="sbo-csv-box">
 			<h2>Markdown Import / Export</h2>
-			<p>Export this brief to a Markdown file, or import a Markdown brief that uses the section and field labels from the template.</p>
+			<p>Export saved brief values to Markdown, including matching live site values where brief fields are empty. Save Client Brief before exporting recent edits. You can also import a Markdown brief that uses the section and field labels from the template. Add values after each label, for example <code>- Business name: Acme Corp</code>. Populated fields update the brief; blank or omitted fields preserve existing values.</p>
 
 			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin-bottom:1em;">
 				<input type="hidden" name="action" value="sbo_export_client_brief_md">

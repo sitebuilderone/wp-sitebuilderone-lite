@@ -1,4 +1,4 @@
-# wp-sitebuilderone-lite
+# wp-sitebuilderone-lite 1.0.85
 
 Lightweight WordPress plugin for local business websites. Stores business data (branding, contact info, social media, integrations) in `wp_options` with zero external dependencies. Supports CSV import/export, full Google Local Business schema compliance, and three custom post types for Services, FAQs, and HowTos.
 

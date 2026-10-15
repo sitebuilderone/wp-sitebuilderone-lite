@@ -2,9 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
-## Unreleased
+## 1.0.85 - 2026-10-15
 
-- No unreleased changes yet.
+- Export import client brief fixed
 
 ## 1.0.7 - 2026-05-05
 
